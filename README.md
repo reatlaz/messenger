@@ -1,3 +1,3 @@
 # VK-FS-Backend
 
-Homework is in different branches of this repository
+Homework and the final project for the backend section of the VK Fullstak course.
