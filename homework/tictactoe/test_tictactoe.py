@@ -1,20 +1,13 @@
-<<<<<<< HEAD
-"Unit test module for TicTacToe game class"
-=======
->>>>>>> e7383b6 (added Tictactoe and unit tests)
+"""Unit test module for TicTacToe game class"""
 import unittest
 import tictactoe
 
+
 class TestInputValidation(unittest.TestCase):
-<<<<<<< HEAD
-    "Unit test class for TicTacToe game class"
+    """Unit test class for TicTacToe game class"""
 
     def test_input(self):
-        "Tests for user input handling"
-=======
-
-    def test_input(self):
->>>>>>> e7383b6 (added Tictactoe and unit tests)
+        """Tests for user input handling"""
         tictac = tictactoe.TicTacToe()
         self.assertTrue(tictac.validate_input('1 2'))
         self.assertTrue(tictac.validate_input('2 3'))
@@ -30,8 +23,7 @@ class TestInputValidation(unittest.TestCase):
         self.assertFalse(tictac.validate_input('he he'))
 
     def test_game(self):
-<<<<<<< HEAD
-        "Tests for winner determination"
+        """Tests for winner determination"""
         tictac = tictactoe.TicTacToe(['X', 'O', ' ', 'X', 'O', ' ', ' ', 'O', 'X'], player='O')
         self.assertEqual(tictac.check_winner(), 'O')
 
@@ -42,25 +34,9 @@ class TestInputValidation(unittest.TestCase):
         self.assertEqual(tictac.check_winner(), 'O')
 
         tictac = tictactoe.TicTacToe(['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'],
-         player='X', count={'X': 5, 'O': 4})
+                                     player='X', count={'X': 5, 'O': 4})
         self.assertEqual(tictac.check_winner(), 'Draw')
+
 
 if __name__ == '__main__':
     unittest.main()
-=======
-        tictac = tictactoe.TicTacToe(['X', 'O', ' ', 'X', 'O', ' ', ' ', 'O', 'X'], 'O')
-        self.assertEqual(tictac.check_winner(), 'O')
-
-        tictac = tictactoe.TicTacToe(['X', ' ', 'O', 'O', 'X', ' ', 'X', 'O', 'X'], 'X')
-        self.assertEqual(tictac.check_winner(), 'X')
-
-        tictac = tictactoe.TicTacToe(['X', ' ', 'X', 'X', 'O', 'X', 'O', 'O', 'O'], 'O')
-        self.assertEqual(tictac.check_winner(), 'O')
-
-        tictac = tictactoe.TicTacToe(['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'], 'X', {'X': 5, 'O': 4})
-        self.assertEqual(tictac.check_winner(), 'Draw')
-        
-
-if __name__ == '__main__':
-    unittest.main()
->>>>>>> e7383b6 (added Tictactoe and unit tests)
