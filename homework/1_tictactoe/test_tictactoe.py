@@ -35,6 +35,12 @@ class TestInputValidation(unittest.TestCase):
 
         tictac = tictactoe.TicTacToe(['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'],
                                      player='X', count={'X': 5, 'O': 4})
+        #check internal data
+        print('given: ', ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'])
+        print('got')
+        tictac.show_board()
+
+        self.assertEqual(tictac.grid, ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'])
         self.assertEqual(tictac.check_winner(), 'Draw')
 
 
