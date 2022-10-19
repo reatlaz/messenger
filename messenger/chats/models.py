@@ -3,7 +3,7 @@ from users.models import User
 
 class Chat(models.Model):
     name = models.CharField(max_length=30)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, blank=True)
 
 
 class Message(models.Model):

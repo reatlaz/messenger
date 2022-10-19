@@ -11,6 +11,20 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import json
+from django.core.exceptions import ImproperlyConfigured
+
+# JSON-based secrets module
+with open('secrets.json') as f:
+    secrets = json.load(f)
+
+def get_secret(setting, secrets=secrets):
+    '''Get the secret variable or return explicit exception.'''
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = 'Set the {0} environment variable'.format(setting)
+        raise ImproperlyConfigured(error_msg)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +34,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'secret_key'
+SECRET_KEY = get_secret('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -37,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
+    'chats',
 ]
 
 MIDDLEWARE = [
@@ -47,8 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'users',
-    'chats',
+
 ]
 
 ROOT_URLCONF = 'application.urls'
@@ -78,11 +93,11 @@ WSGI_APPLICATION = 'application.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'secret',
-        'USER': 'secret',
-        'PASSWORD': 'secret',
-        'HOST': 'secret',
-        'PORT': 0000,
+        'NAME': get_secret('DATABASES_NAME'),
+        'USER': get_secret('DATABASES_USER'),
+        'PASSWORD': get_secret('DATABASES_PASSWORD'),
+        'HOST': get_secret('DATABASES_HOST'),
+        'PORT': get_secret('PORT'),
     }
 }
 
@@ -132,7 +147,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-try:
+""" try:
     from .local_settings import *
 except ImportError:
-    pass
+    pass """
