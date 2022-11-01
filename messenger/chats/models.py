@@ -3,7 +3,10 @@ from users.models import User
 
 class Chat(models.Model):
     name = models.CharField(max_length=30)
-    users = models.ManyToManyField(User, blank=True)
+    users = models.ManyToManyField(User)
+
+    def __str__(self):
+        return str(self.name) + ', ' + str(self.users)
 
 
 class Message(models.Model):
@@ -16,4 +19,8 @@ class Message(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name="chat_messages")
+
+    def __str__(self):
+        return self.chat, self.sender, self.recieved_date
+
     
