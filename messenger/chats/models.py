@@ -1,5 +1,8 @@
 from django.db import models
 from users.models import User
+# ManyToMany -> ChatMember
+# users - нет
+# описание, ад
 
 class Chat(models.Model):
     name = models.CharField(max_length=30)
@@ -22,5 +25,9 @@ class Message(models.Model):
 
     def __str__(self):
         return self.chat, self.sender, self.recieved_date
-
+        
+class ChatMember(models.Model):
+    user = ForeignKey()
+    chat = ForeignKey()
+    date_joined()
     

@@ -15,13 +15,15 @@ def index(request):
     </ul>''')
 
 
-
 @require_GET
 def chat_list(request):
     chats = Chat.objects.values()
 
     return JsonResponse({'chats': list(chats)})
 
+#get_object_or404
+#jsonresponse
+#chat id из URL
 @require_GET
 def chat_detail(request):
     try:
@@ -31,6 +33,10 @@ def chat_detail(request):
         raise Http404
     return HttpResponse(chat, content_type='text/plain')
 
+#request.GET -> request.POST
+#модель chat_member
+#chat.users.add(user_ids)
+#API толкьо с JSONresponse
 @require_POST
 def create_chat(request):
 
