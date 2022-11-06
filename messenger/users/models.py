@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.timezone import now
 
-#сделать другие поля (др, о себе, статус, аватарку)
+
 class User(AbstractUser):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    email = models.EmailField()
+    avatar = models.ImageField(blank=True)
+    bio = models.CharField(max_length=500, default="")
+    status = models.CharField(max_length=20, null=True)
+    birth_date = models.DateField(blank=True, null=True)
+    last_seen = models.DateTimeField(default=now)

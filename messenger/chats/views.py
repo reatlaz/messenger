@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
 from django.utils.html import escape
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 
 from.models import Chat
