@@ -9,3 +9,6 @@ class User(AbstractUser):
     status = models.CharField(max_length=20, null=True)
     birth_date = models.DateField(blank=True, null=True)
     last_seen = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return str(self.pk) + ' ' + str(self.username)
