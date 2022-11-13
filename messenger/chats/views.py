@@ -18,19 +18,14 @@ def chat_list(request, user_id):
 
     response_data = []
     for member in chat_members:
-        try:
-            last_message = Message.objects.filter(chat=member.chat).latest('created_at')
-            last_message_content = last_message.content
-            last_message_created_at = last_message.created_at
-        except Message.DoesNotExist:
-            last_message_content = None
-            last_message_created_at = None
+
+        last_message = Message.objects.filter(chat=member.chat).latest('created_at')
 
         response_data.append({
             'id': member.chat.id,
             'name': member.chat.name,
-            'last_message_text': last_message_content,
-            'last_message_time': last_message_created_at,
+            'last_message_text': last_message.content if last_message else '',
+            'last_message_time': last_message.created_at if last_message else '',
         })
     return JsonResponse({'chats': response_data})
 
@@ -38,7 +33,7 @@ def chat_list(request, user_id):
 @require_GET
 def chat_detail(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
-    print(chat)
+    # print(chat)
     return JsonResponse({
         'name': chat.name,
         'description': chat.description,
@@ -49,13 +44,13 @@ def chat_detail(request, chat_id):
 def create_chat(request):
     # print(request.body)
     chat_name = request.POST.get('chat_name')
-    user_ids = [int(str_user_id) for str_user_id in request.POST.getlist('user_ids[]')]
+    user_ids = [int(str_user_id) for str_user_id in request.POST.getlist('user_ids')]
     # print(request.POST)
     # print(user_ids)
     chat = Chat.objects.create(name=chat_name)
     chat.save()
     for user_id in user_ids:
-        user = User.objects.get(id=user_id)
+        user = get_object_or_404(User, id=user_id)
         member = ChatMember.objects.create(user=user, chat=chat)
         member.save()
     return JsonResponse({'new_chat_id': chat.id})
@@ -117,7 +112,7 @@ def message_detail(request, message_id):
 @require_POST
 def create_message(request):
     message_content = request.POST.get('content')
-    sender = ChatMember.objects.get(id=request.POST.get('sender'))
+    sender = get_object_or_404(ChatMember, id=request.POST.get('sender'))
     message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
     message.save()
 
