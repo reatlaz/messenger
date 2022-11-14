@@ -11,7 +11,7 @@ urlpatterns = [
     path('delete/<int:chat_id>/', delete_chat, name='delete_chat'),
 
     # спросить про REST URL для messages
-    path('<int:chat_id>/messages/list/', message_list, name='message_detail'),
+    path('<int:chat_id>/messages/list/', message_list, name='message_list'),
     path('messages/<int:message_id>/', message_detail, name='message_detail'),
     path('messages/create/<int:chat_id>/', create_message, name='create_message'),
     path('messages/edit/<int:message_id>/', edit_message, name='edit_message'),
