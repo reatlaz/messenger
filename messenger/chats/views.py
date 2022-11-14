@@ -102,6 +102,7 @@ def edit_message(request, message_id):
                 'sender': message.sender.user.id,
                 'created_at': message.created_at,
                 'is_forwarded': message.is_forwarded,
+                'is_read': message.is_read,
             },
         })
 
@@ -174,6 +175,7 @@ def message_detail(request, message_id):
         'sender': message.sender.user.id,
         'created_at': message.created_at,
         'is_forwarded': message.is_forwarded,
+        'is_read': message.is_read,
     })
 
 
