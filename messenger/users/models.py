@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.utils.timezone import now
 
 
 class User(AbstractUser):
@@ -8,7 +7,6 @@ class User(AbstractUser):
     bio = models.CharField(verbose_name='о себе', max_length=500, default="")
     status = models.CharField(verbose_name='статус', default='не в сети', max_length=20, null=True)
     birth_date = models.DateField(verbose_name='дата рождения', blank=True, null=True)
-    last_seen = models.DateTimeField(verbose_name='был(а) в сети', default=now)
 
     class Meta:
         verbose_name = 'Пользователь'

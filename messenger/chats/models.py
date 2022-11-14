@@ -32,6 +32,7 @@ class Message(models.Model):
     content = models.CharField(verbose_name='', max_length=500)
     created_at = models.DateTimeField(verbose_name='дата создания', auto_now_add=True, blank=True)
     is_forwarded = models.BooleanField(verbose_name='переслано', default=False)
+    is_read = models.BooleanField(verbose_name='прочитано', default=False)
     chat = models.ForeignKey(Chat, verbose_name='чат', on_delete=models.CASCADE)
     sender = models.ForeignKey(
         ChatMember,
