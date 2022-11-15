@@ -47,3 +47,8 @@ class Message(models.Model):
 
     def __str__(self):
         return f'{self.id} "{self.content}" created at {self.created_at} | CHAT: {self.chat} | SENDER: {self.sender}'
+
+    def get_chat(self):
+        chat = self.chat
+        full_chat = f'{chat.id} "{chat.name}"'
+        return full_chat
