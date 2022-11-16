@@ -9,13 +9,19 @@ from users.models import User
 from .serializers import MessageSerializer
 
 
+
+
+
 class ChatViewSet(viewsets.ViewSet):
 
     def list(self, request, user_id):
         chat_members = ChatMember.objects.filter(user=user_id)
         response_data = []
         for member in chat_members:
-            last_message = Message.objects.filter(chat=member.chat).latest('created_at')
+            try:
+                last_message = Message.objects.filter(chat=member.chat).latest('created_at')
+            except Message.DoesNotExist:
+                last_message = None
             response_data.append({
                 'id': member.chat.id,
                 'name': member.chat.name,
@@ -23,13 +29,6 @@ class ChatViewSet(viewsets.ViewSet):
                 'last_message_time': last_message.created_at if last_message else '',
             })
         return JsonResponse({'chats': response_data})
-
-    def retrieve(self, request, chat_id):
-        chat = get_object_or_404(Chat, id=chat_id)
-        return JsonResponse({
-            'name': chat.name,
-            'description': chat.description,
-        })
 
     def create(self, request):
         chat_name = request.POST.get('chat_name', 'New chat')
@@ -43,6 +42,13 @@ class ChatViewSet(viewsets.ViewSet):
             member.save()
         return JsonResponse({'new_chat_id': chat.id})
 
+    def retrieve(self, request, chat_id):
+        chat = get_object_or_404(Chat, id=chat_id)
+        return JsonResponse({
+            'id': chat.id,
+            'name': chat.name,
+            'description': chat.description,
+        })
 
     def update(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
@@ -53,6 +59,7 @@ class ChatViewSet(viewsets.ViewSet):
         return JsonResponse({
             'edited_chat':
                 {
+                    'id': chat.id,
                     'name': chat.name,
                     'description': chat.description,
                 },
@@ -107,25 +114,48 @@ class MessageViewSet(viewsets.ViewSet):
                 },
         })
 
-    def delete_message(self, request, message_id):
+    def partial_update(self, request, message_id):
+        message = get_object_or_404(Message, id=message_id)
+        message.is_read = True
+        message.save()
+        return JsonResponse({
+            'message_marked_as_read':
+                {
+                    'id': message.id
+                }
+        })
+
+    def destroy(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
         message.delete()
         return JsonResponse({'deleted_message_id': message_id})
 
 
+class MemberViewSet(viewsets.ViewSet):
 
+    def create(self, request, chat_id, user_id):   # 3 to be tested
+        chat = get_object_or_404(Chat, id=chat_id)
+        user = get_object_or_404(User, id=user_id)
+        member = ChatMember.objects.create(user=user, chat=chat)
+        member.save()
+        return JsonResponse({
+            'user_added_to_chat': {
+                'user_id': user.id,
+                'chat_id': chat.id,
+            }
+        })
 
-
-
-
-
-
-
-
-
-
-
-
+    def destroy(self, request, chat_id, user_id):  # 4 to be tested
+        chat = get_object_or_404(Chat, id=chat_id)
+        user = get_object_or_404(User, id=user_id)
+        member = get_object_or_404(ChatMember, user=user, chat=chat)
+        member.delete()
+        return JsonResponse({
+            'user_deleted_from_chat': {
+                'user_id': user.id,
+                'chat_id': chat.id,
+            }
+        })
 
 
 
@@ -137,47 +167,6 @@ class MessageViewSet(viewsets.ViewSet):
 def index(request):
     return render(request, 'chats/index.html')
 
-
-@require_http_methods(['PUT'])  # 3 to be tested
-def add_member_to_chat(request, chat_id, user_id):
-    chat = get_object_or_404(Chat, id=chat_id)
-    user = get_object_or_404(User, id=user_id)
-    member = ChatMember.objects.create(user=user, chat=chat)
-    member.save()
-    return JsonResponse({
-        'user_added_to_chat': {
-            'user_id': user.id,
-            'chat_id': chat.id,
-        }
-    })
-
-
-@require_http_methods(['DELETE'])  # 4 to be tested
-def delete_member_from_chat(request, chat_id, user_id):
-    chat = get_object_or_404(Chat, id=chat_id)
-    user = get_object_or_404(User, id=user_id)
-    member = get_object_or_404(ChatMember, user=user, chat=chat)
-    member.delete()
-    return JsonResponse({
-        'user_deleted_from_chat': {
-            'user_id': user.id,
-            'chat_id': chat.id,
-        }
-    })
-
-
-
-@require_http_methods(['PUT'])  # 8 to be tested
-def mark_message_as_read(request, message_id):
-    message = get_object_or_404(Message, id=message_id)
-    message.is_read = True
-    message.save()
-    return JsonResponse({
-        'message_marked_as_read':
-            {
-                'id': message.id
-            }
-    })
 
 
 
