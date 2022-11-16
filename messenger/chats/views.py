@@ -3,13 +3,11 @@ from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from rest_framework import viewsets
+from rest_framework.response import Response
 
 from .models import Chat, Message, ChatMember
 from users.models import User
 from .serializers import MessageSerializer
-
-
-
 
 
 class ChatViewSet(viewsets.ViewSet):
@@ -136,8 +134,12 @@ class MemberViewSet(viewsets.ViewSet):
     def create(self, request, chat_id, user_id):   # 3 to be tested
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
-        member = ChatMember.objects.create(user=user, chat=chat)
-        member.save()
+        try:
+            member = ChatMember.objects.get(user=user, chat=chat)
+        except ChatMember.DoesNotExist:
+            member = ChatMember.objects.create(user=user, chat=chat)
+            member.save()
+
         return JsonResponse({
             'user_added_to_chat': {
                 'user_id': user.id,
