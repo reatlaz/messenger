@@ -11,7 +11,8 @@ from .serializers import MessageSerializer
 
 
 class ChatViewSet(viewsets.ViewSet):
-
+    # валидация в сериалайзере ValidationError
+    # сделать максимально короткие view
     def list(self, request, user_id):
         chat_members = ChatMember.objects.filter(user=user_id)
         response_data = []
@@ -29,11 +30,12 @@ class ChatViewSet(viewsets.ViewSet):
         return JsonResponse({'chats': response_data})
 
     def create(self, request):
+        #  validate serializer для получения данных
         chat_name = request.POST.get('chat_name', 'New chat')
         chat_description = request.POST.get('description', '')
         user_ids = [int(str_user_id) for str_user_id in request.POST.getlist('user_ids')]
         chat = Chat.objects.create(name=chat_name, description=chat_description)
-        chat.save()
+        # chat.save()
         for user_id in user_ids:
             user = get_object_or_404(User, id=user_id)
             member = ChatMember.objects.create(user=user, chat=chat)
