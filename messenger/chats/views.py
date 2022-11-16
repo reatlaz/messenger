@@ -46,9 +46,13 @@ def edit_chat(request, chat_id):
 def add_member_to_chat(request, chat_id, user_id):
     chat = get_object_or_404(Chat, id=chat_id)
     user = get_object_or_404(User, id=user_id)
-    member = ChatMember.objects.create(user=user, chat=chat)
-    member.save()
-    return JsonResponse({
+    try:
+        # использовать get or create
+        member = ChatMember.objects.get(user=user, chat=chat)
+    except ChatMember.DoesNotExist:
+        member = ChatMember.objects.create(user=user, chat=chat)
+        member.save()
+    return JsonResponse({ # можно с пустым телом
         'user_added_to_chat': {
             'user_id': user.id,
             'chat_id': chat.id,
@@ -62,7 +66,7 @@ def delete_member_from_chat(request, chat_id, user_id):
     user = get_object_or_404(User, id=user_id)
     member = get_object_or_404(ChatMember, user=user, chat=chat)
     member.delete()
-    return JsonResponse({
+    return JsonResponse({ # нужно с пустым телом
         'user_deleted_from_chat': {
             'user_id': user.id,
             'chat_id': chat.id,
@@ -83,8 +87,8 @@ def create_message(request, chat_id):
     user_id = request.POST.get('user_id')
     sender = get_object_or_404(ChatMember, chat=chat_id, user=user_id)
     message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
-    message.save()
-
+    # message.save()
+    # просто message_id, или, например, везде ключ 'data'
     return JsonResponse({'new_message_id': message.id})
 
 
@@ -112,6 +116,7 @@ def mark_message_as_read(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     message.is_read = True
     message.save()
+    # пустой ответ
     return JsonResponse({
         'message_marked_as_read':
             {
