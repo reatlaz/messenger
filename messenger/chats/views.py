@@ -40,7 +40,7 @@ class ChatViewSet(viewsets.ViewSet):
             user = get_object_or_404(User, id=user_id)
             member = ChatMember.objects.create(user=user, chat=chat)
             member.save()
-        return JsonResponse({'new_chat_id': chat.id})
+        return JsonResponse({'data': chat.id})
 
     def retrieve(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
@@ -57,7 +57,7 @@ class ChatViewSet(viewsets.ViewSet):
         chat.description = json_data.get('description', chat.description)
         chat.save()
         return JsonResponse({
-            'edited_chat':
+            'data':
                 {
                     'id': chat.id,
                     'name': chat.name,
@@ -68,7 +68,7 @@ class ChatViewSet(viewsets.ViewSet):
     def destroy(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
         chat.delete()
-        return JsonResponse({'deleted_chat_id': chat_id})
+        return JsonResponse({})
 
 
 class MessageViewSet(viewsets.ViewSet):
@@ -80,14 +80,8 @@ class MessageViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
-        return JsonResponse({
-            'id': message.id,
-            'content': message.content,
-            'chat': message.chat.id,
-            'sender': message.sender.user.id,
-            'created_at': message.created_at,
-            'is_forwarded': message.is_forwarded,
-        })
+        data = MessageSerializer(message).data
+        return JsonResponse({'data': data})
 
     def create(self, request, chat_id):
         message_content = request.POST.get('content')
@@ -95,7 +89,6 @@ class MessageViewSet(viewsets.ViewSet):
         sender = get_object_or_404(ChatMember, chat=chat_id, user=user_id)
         message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
         message.save()
-
         return JsonResponse({'new_message_id': message.id})
 
     def update(self, request, message_id):
@@ -128,7 +121,7 @@ class MessageViewSet(viewsets.ViewSet):
     def destroy(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
         message.delete()
-        return JsonResponse({'deleted_message_id': message_id})
+        return JsonResponse({})
 
 
 class MemberViewSet(viewsets.ViewSet):
@@ -154,14 +147,7 @@ class MemberViewSet(viewsets.ViewSet):
         user = get_object_or_404(User, id=user_id)
         member = get_object_or_404(ChatMember, user=user, chat=chat)
         member.delete()
-        return JsonResponse({
-            'user_deleted_from_chat': {
-                'user_id': user.id,
-                'chat_id': chat.id,
-            }
-        })
-
-
+        return JsonResponse({})
 
 
 ###################################################################

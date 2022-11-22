@@ -12,7 +12,7 @@ class Chat(models.Model):
         verbose_name_plural = 'Чаты'
 
     def __str__(self):
-        return f'{self.pk} "{self.name}"'
+        return f'{self.pk} {self.name}'
 
 
 class ChatMember(models.Model):
@@ -50,5 +50,10 @@ class Message(models.Model):
 
     def get_chat(self):
         chat = self.chat
-        full_chat = f'{chat.id} "{chat.name}"'
+        full_chat = f'{chat.id} {chat.name}'
         return full_chat
+
+    def get_sender(self):
+        sender = self.user
+        full_sender = f'{sender.id} {sender.username}'
+        return full_sender
