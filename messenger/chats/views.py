@@ -12,7 +12,7 @@ def index(request):
     return render(request, 'chats/index.html')
 
 
-@require_POST  # 1 готово
+@require_POST  # 1
 def create_chat(request):
     chat_name = request.POST.get('chat_name', 'New chat')
     chat_description = request.POST.get('description', '')
@@ -26,7 +26,7 @@ def create_chat(request):
     return JsonResponse({'new_chat_id': chat.id})
 
 
-@require_http_methods(['PUT'])  # 2 готово
+@require_http_methods(['PUT'])  # 2
 def edit_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     json_data = json.loads(request.body)
@@ -42,7 +42,7 @@ def edit_chat(request, chat_id):
         })
 
 
-@require_http_methods(['PUT'])  # 3 to be tested
+@require_http_methods(['PUT'])  # 3
 def add_member_to_chat(request, chat_id, user_id):
     chat = get_object_or_404(Chat, id=chat_id)
     user = get_object_or_404(User, id=user_id)
@@ -51,48 +51,37 @@ def add_member_to_chat(request, chat_id, user_id):
         member = ChatMember.objects.get(user=user, chat=chat)
     except ChatMember.DoesNotExist:
         member = ChatMember.objects.create(user=user, chat=chat)
-        member.save()
-    return JsonResponse({ # можно с пустым телом
-        'user_added_to_chat': {
-            'user_id': user.id,
-            'chat_id': chat.id,
-        }
-    })
+
+    return JsonResponse({'member_id': member.id})
 
 
-@require_http_methods(['DELETE'])  # 4 to be tested
+@require_http_methods(['DELETE'])  # 4
 def delete_member_from_chat(request, chat_id, user_id):
     chat = get_object_or_404(Chat, id=chat_id)
     user = get_object_or_404(User, id=user_id)
     member = get_object_or_404(ChatMember, user=user, chat=chat)
     member.delete()
-    return JsonResponse({ # нужно с пустым телом
-        'user_deleted_from_chat': {
-            'user_id': user.id,
-            'chat_id': chat.id,
-        }
-    })
+    return JsonResponse({})
 
 
-@require_http_methods(['DELETE'])  # 5 готово
+@require_http_methods(['DELETE'])  # 5
 def delete_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     chat.delete()
-    return JsonResponse({'deleted_chat_id': chat_id})
+    return JsonResponse({'chat_id': chat_id})
 
 
-@require_POST  # 6 to be tested
+@require_POST  # 6
 def create_message(request, chat_id):
     message_content = request.POST.get('content')
     user_id = request.POST.get('user_id')
     sender = get_object_or_404(ChatMember, chat=chat_id, user=user_id)
     message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
-    # message.save()
     # просто message_id, или, например, везде ключ 'data'
-    return JsonResponse({'new_message_id': message.id})
+    return JsonResponse({'message_id': message.id})
 
 
-@require_http_methods(['PUT'])  # 7 готово
+@require_http_methods(['PUT'])  # 7
 def edit_message(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     json_data = json.loads(request.body)
@@ -111,28 +100,22 @@ def edit_message(request, message_id):
         })
 
 
-@require_http_methods(['PUT'])  # 8 to be tested
+@require_http_methods(['PUT'])  # 8
 def mark_message_as_read(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     message.is_read = True
     message.save()
-    # пустой ответ
-    return JsonResponse({
-        'message_marked_as_read':
-            {
-                'id': message.id
-            }
-    })
+    return JsonResponse({})
 
 
-@require_http_methods(['DELETE'])  # 9 готово
+@require_http_methods(['DELETE'])  # 9
 def delete_message(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     message.delete()
     return JsonResponse({'deleted_message_id': message_id})
 
 
-@require_GET  # 10 готово
+@require_GET  # 10
 def chat_list(request, user_id):
     chat_members = ChatMember.objects.filter(user=user_id)
     response_data = []
@@ -161,7 +144,7 @@ def message_list(request, chat_id):
     return JsonResponse({'messages': response_data})
 
 
-@require_GET  # 13 готово
+@require_GET  # 13
 def chat_detail(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     return JsonResponse({
@@ -170,7 +153,7 @@ def chat_detail(request, chat_id):
     })
 
 
-@require_GET  # 14 готово
+@require_GET  # 14
 def message_detail(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     return JsonResponse({
