@@ -23,7 +23,7 @@ def create_chat(request):
         user = get_object_or_404(User, id=user_id)
         member = ChatMember.objects.create(user=user, chat=chat)
         member.save()
-    return JsonResponse({'new_chat_id': chat.id})
+    return JsonResponse({'data': chat.id})
 
 
 @require_http_methods(['PUT'])  # 2
@@ -34,8 +34,9 @@ def edit_chat(request, chat_id):
     chat.description = json_data.get('description', chat.description)
     chat.save()
     return JsonResponse({
-        'edited_chat':
+        'data':
             {
+                'id': chat_id,
                 'name': chat.name,
                 'description': chat.description,
             },
@@ -46,13 +47,8 @@ def edit_chat(request, chat_id):
 def add_member_to_chat(request, chat_id, user_id):
     chat = get_object_or_404(Chat, id=chat_id)
     user = get_object_or_404(User, id=user_id)
-    try:
-        # использовать get or create
-        member = ChatMember.objects.get(user=user, chat=chat)
-    except ChatMember.DoesNotExist:
-        member = ChatMember.objects.create(user=user, chat=chat)
-
-    return JsonResponse({'member_id': member.id})
+    member = ChatMember.objects.get_or_create(user=user, chat=chat)
+    return JsonResponse({'data': member.id})
 
 
 @require_http_methods(['DELETE'])  # 4
@@ -68,7 +64,7 @@ def delete_member_from_chat(request, chat_id, user_id):
 def delete_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     chat.delete()
-    return JsonResponse({'chat_id': chat_id})
+    return JsonResponse({})
 
 
 @require_POST  # 6
@@ -78,7 +74,7 @@ def create_message(request, chat_id):
     sender = get_object_or_404(ChatMember, chat=chat_id, user=user_id)
     message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
     # просто message_id, или, например, везде ключ 'data'
-    return JsonResponse({'message_id': message.id})
+    return JsonResponse({'data': message.id})
 
 
 @require_http_methods(['PUT'])  # 7
@@ -88,7 +84,7 @@ def edit_message(request, message_id):
     message.content = json_data.get('content', message.content)
     message.save()
     return JsonResponse({
-        'edited_message':
+        'data':
             {
                 'content': message.content,
                 'chat': message.chat.id,
@@ -112,7 +108,7 @@ def mark_message_as_read(request, message_id):
 def delete_message(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     message.delete()
-    return JsonResponse({'deleted_message_id': message_id})
+    return JsonResponse({})
 
 
 @require_GET  # 10
@@ -127,7 +123,7 @@ def chat_list(request, user_id):
             'last_message_text': last_message.content if last_message else '',
             'last_message_time': last_message.created_at if last_message else '',
         })
-    return JsonResponse({'chats': response_data})
+    return JsonResponse({'data': response_data})
 
 
 @require_GET  # 11
@@ -141,15 +137,17 @@ def message_list(request, chat_id):
             'created_at': message.created_at,
 
         })
-    return JsonResponse({'messages': response_data})
+    return JsonResponse({'data': response_data})
 
 
 @require_GET  # 13
 def chat_detail(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     return JsonResponse({
-        'name': chat.name,
-        'description': chat.description,
+        'data': {
+            'name': chat.name,
+            'description': chat.description,
+        }
     })
 
 
@@ -157,13 +155,15 @@ def chat_detail(request, chat_id):
 def message_detail(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     return JsonResponse({
-        'id': message.id,
-        'content': message.content,
-        'chat': message.chat.id,
-        'sender': message.sender.user.id,
-        'created_at': message.created_at,
-        'is_forwarded': message.is_forwarded,
-        'is_read': message.is_read,
+        'data': {
+            'id': message.id,
+            'content': message.content,
+            'chat': message.chat.id,
+            'sender': message.sender.user.id,
+            'created_at': message.created_at,
+            'is_forwarded': message.is_forwarded,
+            'is_read': message.is_read,
+        }
     })
 
 
