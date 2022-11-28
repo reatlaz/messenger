@@ -54,6 +54,6 @@ class Message(models.Model):
         return full_chat
 
     def get_sender(self):
-        sender = self.user
-        full_sender = f'{sender.id} {sender.username}'
+        sender = self.sender
+        full_sender = f'{sender.user.id} {sender.user.username}'
         return full_sender

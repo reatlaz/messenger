@@ -1,13 +1,14 @@
 import json
-from django.http import JsonResponse, QueryDict
+# from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from rest_framework import viewsets
 from rest_framework.response import Response
+# from rest_framework.generics import RetrieveUpdateDestroyAPIView
 
 from .models import Chat, Message, ChatMember
 from users.models import User
-from .serializers import MessageSerializer
+from .serializers import ChatSerializer, MessageSerializer, MemberSerializer
 
 
 class ChatViewSet(viewsets.ViewSet):
@@ -15,19 +16,17 @@ class ChatViewSet(viewsets.ViewSet):
     # сделать максимально короткие view
     def list(self, request, user_id):
         chat_members = ChatMember.objects.filter(user=user_id)
-        response_data = []
+        data = []
         for member in chat_members:
+            chat = ChatSerializer(member.chat).data
             try:
-                last_message = Message.objects.filter(chat=member.chat).latest('created_at')
+                last_message_object = Message.objects.filter(chat=member.chat).latest('created_at')
+                last_message = MessageSerializer(last_message_object).data
             except Message.DoesNotExist:
                 last_message = None
-            response_data.append({
-                'id': member.chat.id,
-                'name': member.chat.name,
-                'last_message_text': last_message.content if last_message else '',
-                'last_message_time': last_message.created_at if last_message else '',
-            })
-        return JsonResponse({'chats': response_data})
+            chat['last_message'] = last_message
+            data.append(chat)
+        return Response({'data': data})
 
     def create(self, request):
         #  validate serializer для получения данных
@@ -40,15 +39,13 @@ class ChatViewSet(viewsets.ViewSet):
             user = get_object_or_404(User, id=user_id)
             member = ChatMember.objects.create(user=user, chat=chat)
             member.save()
-        return JsonResponse({'data': chat.id})
+        # data = ChatSerializer(chat).data
+        return Response({'data': chat.id}, status=201)
 
     def retrieve(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
-        return JsonResponse({
-            'id': chat.id,
-            'name': chat.name,
-            'description': chat.description,
-        })
+        data = ChatSerializer(chat).data
+        return Response({'data': data})
 
     def update(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
@@ -56,7 +53,7 @@ class ChatViewSet(viewsets.ViewSet):
         chat.name = json_data.get('name', chat.name)
         chat.description = json_data.get('description', chat.description)
         chat.save()
-        return JsonResponse({
+        return Response({
             'data':
                 {
                     'id': chat.id,
@@ -68,7 +65,7 @@ class ChatViewSet(viewsets.ViewSet):
     def destroy(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
         chat.delete()
-        return JsonResponse({})
+        return Response({})
 
 
 class MessageViewSet(viewsets.ViewSet):
@@ -76,12 +73,12 @@ class MessageViewSet(viewsets.ViewSet):
     def list(self, request, chat_id):
         messages = Message.objects.filter(chat=chat_id)
         response_data = MessageSerializer(messages, many=True).data
-        return JsonResponse({'messages': response_data})
+        return Response({'messages': response_data})
 
     def retrieve(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
         data = MessageSerializer(message).data
-        return JsonResponse({'data': data})
+        return Response({'data': data})
 
     def create(self, request, chat_id):
         message_content = request.POST.get('content')
@@ -89,14 +86,14 @@ class MessageViewSet(viewsets.ViewSet):
         sender = get_object_or_404(ChatMember, chat=chat_id, user=user_id)
         message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
         message.save()
-        return JsonResponse({'new_message_id': message.id})
+        return Response({'new_message_id': message.id}, status=201)
 
     def update(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
         json_data = json.loads(request.body)
         message.content = json_data.get('content', message.content)
         message.save()
-        return JsonResponse({
+        return Response({
             'edited_message':
                 {
                     'content': message.content,
@@ -111,7 +108,7 @@ class MessageViewSet(viewsets.ViewSet):
         message = get_object_or_404(Message, id=message_id)
         message.is_read = True
         message.save()
-        return JsonResponse({
+        return Response({
             'message_marked_as_read':
                 {
                     'id': message.id
@@ -121,7 +118,11 @@ class MessageViewSet(viewsets.ViewSet):
     def destroy(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
         message.delete()
-        return JsonResponse({})
+        return Response({})
+
+
+# class AddRemoveMember(RetrieveUpdateDestroyAPIView):
+#    serializer_class = MemberSerializer
 
 
 class MemberViewSet(viewsets.ViewSet):
@@ -129,25 +130,20 @@ class MemberViewSet(viewsets.ViewSet):
     def create(self, request, chat_id, user_id):   # 3 to be tested
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
-        try:
-            member = ChatMember.objects.get(user=user, chat=chat)
-        except ChatMember.DoesNotExist:
-            member = ChatMember.objects.create(user=user, chat=chat)
-            member.save()
+        member = ChatMember.objects.get_or_create(user=user, chat=chat)
 
-        return JsonResponse({
-            'user_added_to_chat': {
-                'user_id': user.id,
-                'chat_id': chat.id,
+        return Response({
+            'data': {
+                'id': member.id,
             }
-        })
+        }, status=201)
 
     def destroy(self, request, chat_id, user_id):  # 4 to be tested
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
         member = get_object_or_404(ChatMember, user=user, chat=chat)
         member.delete()
-        return JsonResponse({})
+        return Response({})
 
 
 ###################################################################
