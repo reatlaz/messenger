@@ -1,8 +1,11 @@
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import RetrieveAPIView
+from .serializers import UserSerializer
+from .models import User
 
-# Create your views here.
 
-def user_detail(request, user_id):
-    return  JsonResponse({'user_info': 'You'})
+class RetrieveUser(RetrieveAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    lookup_url_kwarg = 'user_id'
