@@ -14,6 +14,13 @@ class Chat(models.Model):
     def __str__(self):
         return f'{self.pk} {self.name}'
 
+    def get_last_message(self):
+        try:
+            last_message = Message.objects.filter(chat=self).latest('created_at')
+        except Message.DoesNotExist:
+            last_message = None
+        return last_message
+
 
 class ChatMember(models.Model):
     user = models.ForeignKey(User, verbose_name='пользователь', on_delete=models.SET_NULL, null=True)
@@ -55,5 +62,6 @@ class Message(models.Model):
 
     def get_sender(self):
         sender = self.sender
-        full_sender = f'{sender.user.id} {sender.user.username}'
+        # full_sender = f'{sender.user.id} {sender.user.username}'
+        full_sender = f'{sender.user.username}'
         return full_sender

@@ -10,15 +10,6 @@ class ChatSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 
-class ChatListSerializer(serializers.ModelSerializer):
-    chat = serializers.CharField(source='get_chat')
-    sender = serializers.CharField(source='get_sender')
-
-    class Meta:
-        model = Message
-        fields = ['id', 'name', 'last_message']
-
-
 class MemberSerializer(serializers.ModelSerializer):
     chat = serializers.CharField(source='get_chat')
 
@@ -38,3 +29,12 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'content', 'sender', 'created_at', 'is_forwarded', 'is_read']
 
+
+class ChatListSerializer(serializers.ModelSerializer):
+    # chat = serializers.CharField(source='get_chat')
+    # sender = serializers.CharField(source='get_sender')
+    last_message = MessageSerializer(source='get_last_message')
+
+    class Meta:
+        model = Chat
+        fields = ['id', 'name', 'last_message']

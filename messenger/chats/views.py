@@ -4,12 +4,24 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from rest_framework import viewsets
 from rest_framework.response import Response
-# from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from .models import Chat, Message, ChatMember
 from users.models import User
-from .serializers import ChatSerializer, MessageSerializer, MemberSerializer
+from .serializers import ChatSerializer, ChatListSerializer, MessageSerializer, MemberSerializer
 
+
+class ListCreateChat(ListCreateAPIView):
+    serializer_class = ChatSerializer
+    queryset = Chat.objects.all()
+
+    def list(self, request, user_id):
+        chat_members = ChatMember.objects.filter(user=user_id)
+        data = []
+        for member in chat_members:
+            chat = ChatListSerializer(member.chat).data
+            data.append(chat)
+        return Response({'data': data})
 
 class ChatViewSet(viewsets.ViewSet):
     # валидация в сериалайзере ValidationError
@@ -20,13 +32,7 @@ class ChatViewSet(viewsets.ViewSet):
         chat_members = ChatMember.objects.filter(user=user_id)
         data = []
         for member in chat_members:
-            chat = ChatSerializer(member.chat).data
-            try:
-                last_message_object = Message.objects.filter(chat=member.chat).latest('created_at')
-                last_message = MessageSerializer(last_message_object).data
-            except Message.DoesNotExist:
-                last_message = None
-            chat['last_message'] = last_message
+            chat = ChatListSerializer(member.chat).data
             data.append(chat)
         return Response({'data': data})
 
