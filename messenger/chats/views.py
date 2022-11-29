@@ -14,6 +14,8 @@ from .serializers import ChatSerializer, MessageSerializer, MemberSerializer
 class ChatViewSet(viewsets.ViewSet):
     # валидация в сериалайзере ValidationError
     # сделать максимально короткие view
+    # вопрос: стоит ли делать новый сериализатор для это вью?
+    # вопрос: не мешают ли айди всего и вся из сериализаторов, которые используются в других вью?
     def list(self, request, user_id):
         chat_members = ChatMember.objects.filter(user=user_id)
         data = []
@@ -39,8 +41,8 @@ class ChatViewSet(viewsets.ViewSet):
             user = get_object_or_404(User, id=user_id)
             member = ChatMember.objects.create(user=user, chat=chat)
             member.save()
-        # data = ChatSerializer(chat).data
-        return Response({'data': chat.id}, status=201)
+        data = ChatSerializer(chat).data
+        return Response({'data': data}, status=201)
 
     def retrieve(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
@@ -49,18 +51,12 @@ class ChatViewSet(viewsets.ViewSet):
 
     def update(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
-        json_data = json.loads(request.body)
-        chat.name = json_data.get('name', chat.name)
-        chat.description = json_data.get('description', chat.description)
+        request_json = json.loads(request.body)
+        chat.name = request_json.get('name', chat.name)
+        chat.description = request_json.get('description', chat.description)
         chat.save()
-        return Response({
-            'data':
-                {
-                    'id': chat.id,
-                    'name': chat.name,
-                    'description': chat.description,
-                },
-            })
+        data = ChatSerializer(chat).data
+        return Response({'data': data})
 
     def destroy(self, request, chat_id):
         chat = get_object_or_404(Chat, id=chat_id)
