@@ -11,11 +11,11 @@ class ChatSerializer(serializers.ModelSerializer):
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    chat = serializers.CharField(source='get_chat')
+    # chat = serializers.CharField(source='get_chat')
 
     class Meta:
         model = ChatMember
-        fields = ['id', 'chat', 'user']
+        fields = ['id', 'chat', 'user', 'role']
 
 
 #####################################################
