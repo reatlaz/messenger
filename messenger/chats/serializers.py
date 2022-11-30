@@ -28,6 +28,7 @@ class ChatSerializer(serializers.ModelSerializer):
         for member_dict in members:
             member_dict['chat'] = chat
             ChatMember.objects.create(**member_dict)
+        ChatMember.objects.create(user=self.context['auth_user'])
         return chat
 
 

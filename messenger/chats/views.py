@@ -1,9 +1,10 @@
 import json
 # from django.http import JsonResponse
+from login_required import login_not_required
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
@@ -17,13 +18,13 @@ from .serializers import MemberSerializer
 class ChatViewSet(viewsets.ViewSet):
     # вопрос: стоит ли делать новый сериализатор для это вью?
     # вопрос: не мешают ли айди всего и вся из сериализаторов, которые используются в других вью?
-    def list(self, request, user_id):
-        chat_members = Chat.objects.filter(members__user=user_id)
+    def list(self, request):
+        chat_members = Chat.objects.filter(members__user=request.user.id)
         data = ChatListSerializer(chat_members, many=True).data
         return Response({'data': data})
 
     def create(self, request):
-        serializer = ChatSerializer(data=request.data)
+        serializer = ChatSerializer(data=request.data, context={'auth_user': request.user})
         serializer.is_valid(raise_exception=True)
         chat = serializer.save()
         return Response({'data': ChatSerializer(chat).data}, status=201)
@@ -89,7 +90,10 @@ class MessageViewSet(viewsets.ViewSet):
 
 class MemberViewSet(viewsets.ViewSet):
 
-    def create(self, request, chat_id, user_id):   # 3 to be tested
+    def create(self, request, chat_id, user_id):
+        usr = ChatMember.objects.get(user_id=request.user.id, chat_id=chat_id)
+        if not(usr.role == 'admin' or usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to add users"})
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
         if ChatMember.objects.filter(user=user, chat=chat).exists():
@@ -99,7 +103,10 @@ class MemberViewSet(viewsets.ViewSet):
             data = MemberSerializer(member).data
             return Response({'data': data})
 
-    def destroy(self, request, chat_id, user_id):  # 4 to be tested
+    def destroy(self, request, chat_id, user_id):
+        usr = ChatMember.objects.get(user_id=request.user.id, chat_id=chat_id)
+        if not (usr.role == 'admin' or usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to delete users"})
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
         member = get_object_or_404(ChatMember, user=user, chat=chat)
@@ -113,6 +120,21 @@ class MemberViewSet(viewsets.ViewSet):
 @require_GET
 def index(request):
     return render(request, 'chats/index.html')
+
+
+@login_not_required
+@require_GET
+def home(request):
+    return render(request, 'home.html')
+
+
+
+@require_GET
+@login_not_required
+def login(request):
+    return render(request, 'login.html')
+
+
 
 
 
