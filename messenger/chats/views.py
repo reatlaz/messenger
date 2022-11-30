@@ -30,10 +30,20 @@ class ChatViewSet(viewsets.ViewSet):
         return Response({'data': ChatSerializer(chat).data}, status=201)
 
     def retrieve(self, request, chat_id):
+        try:
+            ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat"})
         chat = get_object_or_404(Chat, id=chat_id)
         return Response({'data': ChatSerializer(chat).data})
 
     def update(self, request, chat_id):
+        try:
+            auth_usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        if not (auth_usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to alter this chat"})
         serializer = ChatUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # а можно как-то короче через save?
@@ -42,6 +52,10 @@ class ChatViewSet(viewsets.ViewSet):
         return Response({'data': ChatUpdateSerializer(chat).data})
 
     def destroy(self, request, chat_id):
+        try:
+            ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat"})
         chat = get_object_or_404(Chat, id=chat_id)
         chat.delete()
         return Response({})
@@ -50,21 +64,41 @@ class ChatViewSet(viewsets.ViewSet):
 class MessageViewSet(viewsets.ViewSet):
 
     def list(self, request, chat_id):
+        try:
+            ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
         messages = Message.objects.filter(chat=chat_id)
         data = MessageSerializer(messages, many=True).data
         return Response({'data': data})
 
     def retrieve(self, request, message_id):
-        message = get_object_or_404(Message, id=message_id)
+        try:
+            message = get_object_or_404(Message, id=message_id)
+            ChatMember.objects.get(user=request.user, chat_id=message.chat.id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+
         return Response({'data': MessageSerializer(message).data})
 
     def create(self, request, chat_id):
-        serializer = MessageSerializer(data=request.data, context={'chat_id': chat_id})
+        try:
+            auth_usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        serializer = MessageSerializer(data=request.data, context={'chat_id': chat_id, 'auth_usr': auth_usr})
         serializer.is_valid(raise_exception=True)
         message = serializer.save()
         return Response({'data': MessageSerializer(message).data}, status=201)
 
     def update(self, request, message_id):
+        try:
+            message = get_object_or_404(Message, id=message_id)
+            auth_usr = ChatMember.objects.get(user=request.user, chat_id=message.chat.id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        if not (auth_usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to alter this chat"})
         serializer = MessageUpdateSerializer(
             data=request.data, context={'message_id': message_id})
         serializer.is_valid(raise_exception=True)
@@ -91,8 +125,8 @@ class MessageViewSet(viewsets.ViewSet):
 class MemberViewSet(viewsets.ViewSet):
 
     def create(self, request, chat_id, user_id):
-        usr = ChatMember.objects.get(user_id=request.user.id, chat_id=chat_id)
-        if not(usr.role == 'admin' or usr.role == 'admin'):
+        usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        if not(usr.role == 'admin'):
             raise PermissionDenied({"message": "You don't have permission to add users"})
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
@@ -104,8 +138,8 @@ class MemberViewSet(viewsets.ViewSet):
             return Response({'data': data})
 
     def destroy(self, request, chat_id, user_id):
-        usr = ChatMember.objects.get(user_id=request.user.id, chat_id=chat_id)
-        if not (usr.role == 'admin' or usr.role == 'admin'):
+        usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        if not (usr.role == 'admin'):
             raise PermissionDenied({"message": "You don't have permission to delete users"})
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)

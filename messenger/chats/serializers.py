@@ -28,7 +28,7 @@ class ChatSerializer(serializers.ModelSerializer):
         for member_dict in members:
             member_dict['chat'] = chat
             ChatMember.objects.create(**member_dict)
-        ChatMember.objects.create(user=self.context['auth_user'])
+        ChatMember.objects.create(user=self.context['auth_user'], chat=chat, role='admin')
         return chat
 
 
@@ -61,8 +61,9 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         chat_id = self.context['chat_id']
+        auth_usr = self.context['auth_usr']
         chat = get_object_or_404(Chat, id=chat_id)
-        message = Message.objects.create(chat=chat, **validated_data)
+        message = Message.objects.create(chat=chat, sender=auth_usr, **validated_data)
 
         return message
 
