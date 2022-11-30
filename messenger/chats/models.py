@@ -24,7 +24,7 @@ class Chat(models.Model):
 
 class ChatMember(models.Model):
     user = models.ForeignKey(User, verbose_name='пользователь', on_delete=models.SET_NULL, null=True)
-    chat = models.ForeignKey(Chat, verbose_name='чат', on_delete=models.CASCADE)
+    chat = models.ForeignKey(Chat, verbose_name='чат', on_delete=models.CASCADE, related_name='members')
     role = models.CharField(verbose_name='роль', max_length=20, default='member')
 
     class Meta:
@@ -62,6 +62,6 @@ class Message(models.Model):
 
     def get_sender(self):
         sender = self.sender
-        # full_sender = f'{sender.user.id} {sender.user.username}'
-        full_sender = f'{sender.user.username}'
-        return full_sender
+        # return f'{sender.user.id} {sender.user.username}'
+        return f'{sender.user.username}'
+

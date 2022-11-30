@@ -1,33 +1,94 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .models import Chat, Message, ChatMember
-
-
-class ChatSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Chat
-        fields = ['id', 'name', 'description']
+from users.models import User
+from users.serializers import UserSerializer
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    # chat = serializers.CharField(source='get_chat')
 
     class Meta:
         model = ChatMember
-        fields = ['id', 'chat', 'user', 'role']
+        fields = ['id', 'user', 'role']
 
 
-#####################################################
+class ChatSerializer(serializers.ModelSerializer):
+    members = MemberSerializer(many=True, write_only=True, required=False)
+
+    class Meta:
+        model = Chat
+        fields = ['id', 'name', 'description', 'members']
+
+    def create(self, validated_data):
+        members = validated_data.pop('members', [])
+        chat = Chat.objects.create(**validated_data)
+        for member_dict in members:
+            member_dict['chat'] = chat
+            ChatMember.objects.create(**member_dict)
+        return chat
+
+
+class ChatUpdateSerializer(serializers.ModelSerializer):
+    members = MemberSerializer(many=True, write_only=True, required=False)
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+
+    class Meta:
+        model = Chat
+        fields = ['id', 'name', 'description', 'members']
+
+    def update(self, chat, validated_data):
+        chat.name = validated_data.get('name', chat.name)
+        chat.description = validated_data.get('description', chat.description)
+        members = validated_data.pop('members', [])
+        for member_dict in members:
+            member_dict['chat'] = chat
+            ChatMember.objects.create(**member_dict)
+        chat.save()
+        return chat
+#############################################################################
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    # chat = serializers.CharField(source='get_chat')
-    sender = serializers.CharField(source='get_sender')
 
     class Meta:
         model = Message
         fields = ['id', 'content', 'sender', 'created_at', 'is_forwarded', 'is_read']
+
+    def create(self, validated_data):
+        chat_id = self.context['chat_id']
+        chat = get_object_or_404(Chat, id=chat_id)
+        message = Message.objects.create(chat=chat, **validated_data)
+
+        return message
+
+
+class MessageUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = ['id', 'content', 'sender', 'created_at', 'is_forwarded', 'is_read']
+
+    def update(self, message, validated_data):
+        message.content = validated_data['content']
+        message.save()
+        return message
+
+
+class MessageMarkAsReadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = []
+
+    def update(self, message, validated_data):
+        message.is_read = True
+        message.save()
+        return message
+#############################################################################
 
 
 class ChatListSerializer(serializers.ModelSerializer):
