@@ -156,7 +156,6 @@ def index(request):
     return render(request, 'chats/index.html')
 
 
-@login_not_required
 @require_GET
 def home(request):
     return render(request, 'home.html')
