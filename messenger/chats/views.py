@@ -9,10 +9,11 @@ from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from .models import Chat, Message, ChatMember
-from users.models import User
+from users.models import User, UsersLastMonth
 from .serializers import ChatSerializer, ChatListSerializer, ChatUpdateSerializer
 from .serializers import MessageSerializer, MessageUpdateSerializer, MessageMarkAsReadSerializer
 from .serializers import MemberSerializer
+from .tasks import send_email
 
 
 class ChatViewSet(viewsets.ViewSet):
@@ -134,6 +135,7 @@ class MemberViewSet(viewsets.ViewSet):
             raise ValidationError("User already in the chat")
         else:
             member = ChatMember.objects.create(user=user, chat=chat)
+            send_email(user.username, chat_id)
             data = MemberSerializer(member).data
             return Response({'data': data})
 
@@ -161,11 +163,11 @@ def home(request):
     return render(request, 'home.html')
 
 
-
 @require_GET
 @login_not_required
 def login(request):
-    return render(request, 'login.html')
+    users_last_month = UsersLastMonth.objects.get_or_create(pk=1)[0].number
+    return render(request, 'login.html', {'users_last_month': users_last_month})
 
 
 
