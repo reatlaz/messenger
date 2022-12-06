@@ -14,9 +14,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.pk} {self.username}'
-
-
-class UsersLastMonth(models.Model):
-    number = models.IntegerField(verbose_name='Число новых пользователей зай последний месяц', default=0)
-
-

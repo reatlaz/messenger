@@ -1,6 +1,7 @@
+import redis
 from django.core.mail import EmailMessage
 from django.utils import timezone
-from users.models import User, UsersLastMonth
+from users.models import User
 from chats.models import ChatMember, Chat
 
 from dateutil.relativedelta import relativedelta
@@ -16,10 +17,9 @@ def add_together(a, b):
 @app.task()
 def update_unique_users():
     last_month = timezone.now().today() - relativedelta(months=5)
-    res = User.objects.filter(date_joined__gt=last_month)
-    users_last_month = UsersLastMonth.objects.get_or_create(pk=1)[0]
-    users_last_month.number = len(res)
-    users_last_month.save()
+    users_last_month = len(User.objects.filter(date_joined__gt=last_month))
+    r = redis.Redis()
+    r.set('users_last_month', users_last_month)
 
 
 

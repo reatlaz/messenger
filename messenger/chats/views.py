@@ -1,4 +1,4 @@
-import json
+import redis
 # from django.http import JsonResponse
 from login_required import login_not_required
 from django.shortcuts import render, get_object_or_404
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from .models import Chat, Message, ChatMember
-from users.models import User, UsersLastMonth
+from users.models import User
 from .serializers import ChatSerializer, ChatListSerializer, ChatUpdateSerializer
 from .serializers import MessageSerializer, MessageUpdateSerializer, MessageMarkAsReadSerializer
 from .serializers import MemberSerializer
@@ -166,7 +166,11 @@ def home(request):
 @require_GET
 @login_not_required
 def login(request):
-    users_last_month = UsersLastMonth.objects.get_or_create(pk=1)[0].number
+    r = redis.Redis()
+    if r.exists('users_last_month'):
+        users_last_month = int(r.get('users_last_month'))
+    else:
+        users_last_month = 0
     return render(request, 'login.html', {'users_last_month': users_last_month})
 
 
