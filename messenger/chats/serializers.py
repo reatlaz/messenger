@@ -54,7 +54,7 @@ class ChatUpdateSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = serializers.CharField(source='get_sender')
+    sender = serializers.CharField(source='get_sender', required=False)
 
     class Meta:
         model = Message
