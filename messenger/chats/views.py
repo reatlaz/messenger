@@ -166,11 +166,12 @@ def home(request):
 @require_GET
 @login_not_required
 def login(request):
-    r = redis.Redis()
-    if r.exists('users_last_month'):
-        users_last_month = int(r.get('users_last_month'))
-    else:
-        users_last_month = 0
+#    r = redis.Redis()
+#    if r.exists('users_last_month'):
+#        users_last_month = int(r.get('users_last_month'))
+#    else:
+#        users_last_month = 0
+    users_last_month = 0
     return render(request, 'login.html', {'users_last_month': users_last_month})
 
 
