@@ -43,11 +43,11 @@ ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
 
 CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com']
 
-CORS_ALLOWED_ORIGINS = [
-    'https://reatlaz.github.io/',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000'
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'https://reatlaz.github.io',
+#     'http://localhost:3000',
+#     'http://127.0.0.1:3000'
+# ]
 CORS_ALLOW_ALL_ORIGINS = True
 # Application definition
 INSTALLED_APPS = [
