@@ -40,10 +40,7 @@ SECRET_KEY = get_secret('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://reatlaz.github.io/'
-]
+
 CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com']
 # Application definition
 
@@ -67,8 +64,6 @@ MIDDLEWARE = [
 #    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 #    'login_required.middleware.LoginRequiredMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
