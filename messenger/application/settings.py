@@ -41,7 +41,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
 
-CSRF_TRUSTED_ORIGINS = ['reatlaz.pythonanywhere.com']
+CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com']
 # Application definition
 
 INSTALLED_APPS = [
