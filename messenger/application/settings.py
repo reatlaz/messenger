@@ -42,8 +42,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
 
 CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com']
-# Application definition
 
+CORS_ALLOWED_ORIGINS = [
+    'https://reatlaz.github.io/',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+]
+CORS_ALLOW_ALL_ORIGINS = True
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'social_django',
     'rest_framework',
     'users',
@@ -60,6 +67,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
