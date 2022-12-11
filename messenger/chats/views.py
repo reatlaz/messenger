@@ -20,7 +20,8 @@ class ChatViewSet(viewsets.ViewSet):
     # вопрос: стоит ли делать новый сериализатор для это вью?
     # вопрос: не мешают ли айди всего и вся из сериализаторов, которые используются в других вью?
     def list(self, request):
-        chat_members = Chat.objects.filter(members__user=request.user.id)
+        #chat_members = Chat.objects.filter(members__user=request.user.id)
+        chat_members = Chat.objects.filter(members__user=3)
         data = ChatListSerializer(chat_members, many=True).data
         return Response({'data': data})
 
