@@ -3,6 +3,7 @@ import redis
 from login_required import login_not_required
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.response import Response
@@ -38,7 +39,15 @@ class ChatViewSet(viewsets.ViewSet):
         except ChatMember.DoesNotExist:
             raise PermissionDenied({"message": "You don't have access to this chat"})
         chat = get_object_or_404(Chat, id=chat_id)
-        return Response({'data': ChatSerializer(chat).data})
+        if chat.is_private:
+            member = get_object_or_404(ChatMember, Q(chat_id=chat_id) & ~Q(user_id=3))
+            last_login = member.user.last_login
+        else:
+            last_login = None
+        return Response({'data': {
+            'chat': ChatSerializer(chat).data,
+            'last_login': last_login
+        }})
 
     def update(self, request, chat_id):
         try:
@@ -82,7 +91,6 @@ class MessageViewSet(viewsets.ViewSet):
             ChatMember.objects.get(user=request.user, chat_id=message.chat.id)
         except ChatMember.DoesNotExist:
             raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
-
         return Response({'data': MessageSerializer(message).data})
 
     def create(self, request, chat_id):
