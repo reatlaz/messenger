@@ -41,6 +41,7 @@ class ChatViewSet(viewsets.ViewSet):
         chat = get_object_or_404(Chat, id=chat_id)
         if chat.is_private:
             member = get_object_or_404(ChatMember, Q(chat_id=chat_id) & ~Q(user_id=3))
+            chat.name = member.user.first_name + ' ' + member.user.first_name
             last_login = member.user.last_login
         else:
             last_login = None
