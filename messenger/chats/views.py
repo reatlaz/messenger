@@ -21,10 +21,13 @@ class ChatViewSet(viewsets.ViewSet):
     # вопрос: стоит ли делать новый сериализатор для это вью?
     # вопрос: не мешают ли айди всего и вся из сериализаторов, которые используются в других вью?
     def list(self, request):
-        #chat_members = Chat.objects.filter(members__user=request.user.id)
-        chat_members = Chat.objects.filter(members__user=3)
-        data = ChatListSerializer(chat_members, many=True).data
-        return Response({'data': data})
+        #chats = Chat.objects.filter(members__user=request.user.id)
+        chats = Chat.objects.filter(members__user=3)
+        for chat in chats:
+            if chat.is_private:
+                member = get_object_or_404(ChatMember, Q(chat=chat) & ~Q(user_id=3))
+                chat.name = member.user.first_name + ' ' + member.user.last_name
+        return Response({'data': ChatListSerializer(chats, many=True).data})
 
     def create(self, request):
         serializer = ChatSerializer(data=request.data, context={'auth_user': request.user})
@@ -41,7 +44,7 @@ class ChatViewSet(viewsets.ViewSet):
         chat = get_object_or_404(Chat, id=chat_id)
         if chat.is_private:
             member = get_object_or_404(ChatMember, Q(chat_id=chat_id) & ~Q(user_id=3))
-            chat.name = member.user.first_name + ' ' + member.user.first_name
+            chat.name = member.user.first_name + ' ' + member.user.last_name
             last_login = member.user.last_login
         else:
             last_login = None
