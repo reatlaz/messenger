@@ -59,7 +59,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'content', 'sender', 'created_at', 'is_forwarded', 'is_read']
+        fields = ['id', 'content', 'sender', 'created_at', 'image', 'is_forwarded', 'is_read']
 
     def create(self, validated_data):
         chat_id = self.context['chat_id']
