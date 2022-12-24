@@ -3,7 +3,7 @@ from users.models import User
 
 
 class Chat(models.Model):
-    is_private = models.BooleanField(verbose_name='приватный', default=False)
+    #is_private = models.BooleanField(verbose_name='приватный', default=False)
     name = models.CharField(verbose_name='название', max_length=30)
     description = models.CharField(verbose_name='описание', max_length=500, default="")
     picture = models.ImageField(verbose_name='картинка', null=True)
