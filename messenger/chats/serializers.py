@@ -55,7 +55,7 @@ class ChatUpdateSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    content = serializers.ModelField(allow_blank=True)
+    content = serializers.CharField(allow_blank=True)
     image = serializers.URLField(required=False, allow_blank=True)
     sender = serializers.CharField(source='get_sender', required=False)
 
