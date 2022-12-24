@@ -20,7 +20,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['id', 'name', 'description', 'members', 'is_private']
+        fields = ['id', 'name', 'description', 'members']
 
     def create(self, validated_data):
         members = validated_data.pop('members', [])
