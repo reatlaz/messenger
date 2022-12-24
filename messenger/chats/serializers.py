@@ -20,7 +20,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ['id', 'name', 'description', 'members']
+        fields = ['id', 'name', 'description', 'members', 'is_private']
 
     def create(self, validated_data):
         members = validated_data.pop('members', [])
@@ -74,7 +74,7 @@ class MessageUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'content', 'sender', 'created_at', 'is_forwarded', 'is_read']
+        fields = ['id', 'content', 'sender', 'created_at', 'image', 'is_forwarded', 'is_read']
 
     def update(self, message, validated_data):
         message.content = validated_data['content']
