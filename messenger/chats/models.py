@@ -43,6 +43,7 @@ class Message(models.Model):
     is_read = models.BooleanField(verbose_name='прочитано', default=False)
     chat = models.ForeignKey(Chat, verbose_name='чат', on_delete=models.CASCADE)
     image = models.URLField(verbose_name='ссылка на картинку', max_length=500, blank=True, null=True)
+    audio = models.URLField(verbose_name='ссылка на голосовое сообщение', max_length=500, blank=True, null=True)
     sender = models.ForeignKey(
         ChatMember,
         verbose_name='отправитель',

@@ -57,11 +57,12 @@ class ChatUpdateSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     content = serializers.CharField(allow_blank=True)
     image = serializers.URLField(required=False, allow_blank=True)
+    audio = serializers.URLField(required=False, allow_blank=True)
     sender = serializers.CharField(source='get_sender', required=False)
 
     class Meta:
         model = Message
-        fields = ['id', 'content', 'sender', 'created_at', 'image', 'is_forwarded', 'is_read']
+        fields = ['id', 'content', 'sender', 'created_at', 'image', 'audio', 'is_forwarded', 'is_read']
 
     def create(self, validated_data):
         chat_id = self.context['chat_id']
