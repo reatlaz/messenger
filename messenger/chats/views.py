@@ -21,11 +21,11 @@ class ChatViewSet(viewsets.ViewSet):
     # вопрос: стоит ли делать новый сериализатор для это вью?
     # вопрос: не мешают ли айди всего и вся из сериализаторов, которые используются в других вью?
     def list(self, request):
-        chats = Chat.objects.filter(members__user=request.user.id)
-        # chats = Chat.objects.filter(members__user=3)
+        #chats = Chat.objects.filter(members__user=request.user.id)
+        chats = Chat.objects.filter(members__user=3)
         for chat in chats:
             if chat.is_private:
-                member = get_object_or_404(ChatMember, Q(chat=chat) & ~Q(user_id=request.user.id))
+                member = get_object_or_404(ChatMember, Q(chat=chat) & ~Q(user_id=3))
                 chat.name = member.user.first_name + ' ' + member.user.last_name
         return Response({'data': ChatListSerializer(chats, many=True).data})
 
@@ -37,13 +37,13 @@ class ChatViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, chat_id):
         try:
-            ChatMember.objects.get(user=request.user, chat_id=chat_id)
-            # ChatMember.objects.get(user_id=3, chat_id=chat_id)
+            #ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            ChatMember.objects.get(user_id=3, chat_id=chat_id)
         except ChatMember.DoesNotExist:
             raise PermissionDenied({"message": "You don't have access to this chat"})
         chat = get_object_or_404(Chat, id=chat_id)
         if chat.is_private:
-            member = get_object_or_404(ChatMember, Q(chat_id=chat_id) & ~Q(user_id=request.user.id))
+            member = get_object_or_404(ChatMember, Q(chat_id=chat_id) & ~Q(user_id=3))
             chat.name = member.user.first_name + ' ' + member.user.last_name
             last_login = member.user.last_login
         else:
@@ -81,8 +81,8 @@ class MessageViewSet(viewsets.ViewSet):
 
     def list(self, request, chat_id):
         try:
-            ChatMember.objects.get(user=request.user, chat_id=chat_id)
-            # ChatMember.objects.get(user_id=3, chat_id=chat_id)
+            # ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            ChatMember.objects.get(user_id=3, chat_id=chat_id)
         except ChatMember.DoesNotExist:
             raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
         messages = Message.objects.filter(chat=chat_id)
@@ -99,8 +99,8 @@ class MessageViewSet(viewsets.ViewSet):
 
     def create(self, request, chat_id):
         try:
-            auth_usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
-            # auth_usr = ChatMember.objects.get(user_id=3, chat_id=chat_id)
+            # auth_usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            auth_usr = ChatMember.objects.get(user_id=3, chat_id=chat_id)
         except ChatMember.DoesNotExist:
             raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
         serializer = MessageSerializer(data=request.data, context={'chat_id': chat_id, 'auth_usr': auth_usr})
