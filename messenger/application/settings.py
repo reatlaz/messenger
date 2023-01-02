@@ -111,7 +111,7 @@ EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 ADMINS = ["m3sseng3r@yandex.ru"]
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'login'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret('GOOGLE_OAUTH2_KEY')  # App ID
