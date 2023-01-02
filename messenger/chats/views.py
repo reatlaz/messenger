@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.db.models import Q
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotAuthenticated
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
@@ -36,6 +36,10 @@ class ChatViewSet(viewsets.ViewSet):
         return Response({'data': ChatSerializer(chat).data}, status=201)
 
     def retrieve(self, request, chat_id):
+        try:
+            request.user.id
+        except TypeError:
+            raise NotAuthenticated({"message": "You must be authorized to view this page"})
         try:
             ChatMember.objects.get(user=request.user, chat_id=chat_id)
             # ChatMember.objects.get(user_id=3, chat_id=chat_id)
