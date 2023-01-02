@@ -54,6 +54,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
     'Content-Type',
+    'Access-Control-Allow-Credentials'
 ]
 # Application definition
 INSTALLED_APPS = [
