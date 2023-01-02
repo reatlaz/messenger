@@ -49,9 +49,13 @@ CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com']
 #     'http://127.0.0.1:3000'
 # ]
 # CORS_ALLOW_ALL_ORIGINS = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:3000', #For React Project
+    'http://127.0.0.1:8000'  #For Django Project
 ]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000',
+# ]
 CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
     'Content-Type',
