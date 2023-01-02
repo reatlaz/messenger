@@ -42,22 +42,15 @@ DEBUG = True
 ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
 
 CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com']
-
-# CORS_ALLOWED_ORIGINS = [
-#     'https://reatlaz.github.io',
-#     'http://localhost:3000',
-#     'http://127.0.0.1:3000'
-# ]
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
-# CORS_ALLOWED_ORIGINS = [
-#     'http://127.0.0.1:3000', #For React Project
-#     'http://127.0.0.1:8000'  #For Django Project
-# ]
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
+    'https://reatlaz.github.io',
     'http://localhost:3000',
-    'http://127.0.0.1:3000',  # For React Project
-    'http://127.0.0.1:8000'  # For Django Project
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:8000'
 ]
+
 CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
     'Content-Type',
