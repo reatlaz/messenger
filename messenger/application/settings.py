@@ -132,7 +132,7 @@ EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 ADMINS = ["m3sseng3r@yandex.ru"]
 
 LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
-LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
 LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
 LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 
