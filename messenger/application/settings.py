@@ -52,8 +52,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = None
 CSRF_COOKIE_HTTPONLY = True  #
 SESSION_COOKIE_HTTPONLY = True
 
@@ -129,7 +129,7 @@ ADMINS = ["m3sseng3r@yandex.ru"]
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
 # LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV/'
-LOGOUT_URL = 'logout'
+LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
 LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 # LOGOUT_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV/#/login/'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret('GOOGLE_OAUTH2_KEY')  # App ID
