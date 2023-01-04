@@ -78,6 +78,12 @@ LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATUL
 # LOGOUT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
 # LOGOUT_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ]
+}
+
 CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
     'Content-Type',
@@ -94,13 +100,6 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.BasicAuthentication',
-#         'rest_framework.authentication.SessionAuthentication',
-#     ]
-# }
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
