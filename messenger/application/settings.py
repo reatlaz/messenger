@@ -61,12 +61,21 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
 
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
+LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
+LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
+LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+
+# LOGIN_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+# LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
+# LOGOUT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
+# LOGOUT_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 
 CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
@@ -144,15 +153,6 @@ EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 # administrator list
 ADMINS = ["m3sseng3r@yandex.ru"]
 
-# LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
-# LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
-# LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
-# LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
-
-LOGIN_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
-LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
-LOGOUT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
-LOGOUT_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret('GOOGLE_OAUTH2_KEY')  # App ID
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_secret('GOOGLE_OAUTH2_SECRET')  # App Secret
