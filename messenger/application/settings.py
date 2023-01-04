@@ -41,7 +41,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
 
-CSRF_USE_SESSIONS = True
+CSRF_USE_SESSIONS = False
 CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com', 'http://localhost:3000', 'http://127.0.0.1:3000']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
@@ -56,7 +56,7 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
 
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = True
