@@ -41,7 +41,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
 
-CSRF_USE_SESSIONS = False
+# CSRF_USE_SESSIONS = True
 CSRF_TRUSTED_ORIGINS = ['https://reatlaz.pythonanywhere.com', 'http://localhost:3000', 'http://127.0.0.1:3000']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
@@ -56,7 +56,7 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
 
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = True
@@ -99,7 +99,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
