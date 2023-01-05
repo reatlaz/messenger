@@ -23,8 +23,8 @@ from chats import views as views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', index, name='index'),
-    path('chats/', include('chats.urls')),
-    path('users/', include('users.urls')),
+    path('api/chats/', include('chats.urls')),
+    path('api/users/', include('users.urls')),
 
     path('', views.home, name='home'),
     path('login/', views.login, name='login'),
