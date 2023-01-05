@@ -57,11 +57,11 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://127.0.0.1:8000'
 ]
-CSRF_COOKIE_DOMAIN = 'http://localhost:3000'
+
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
-CSRF_COOKIE_SAMESITE = None
-SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
@@ -79,11 +79,11 @@ LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATUL
 # LOGOUT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
 # LOGOUT_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication'
-    ]
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.SessionAuthentication'
+#     ]
+# }
 
 CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Origin',
