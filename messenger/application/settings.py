@@ -58,19 +58,19 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8000'
 ]
 
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+# CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
-
-CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_HTTPONLY = True
+# CSRF_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SAMESITE = 'None'
+#
+# CSRF_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_HTTPONLY = True
 
 # SESSION_COOKIE_DOMAIN = 'localhost'
 # CSRF_COOKIE_DOMAIN = 'localhost'
-
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+#
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
 
 LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
@@ -120,9 +120,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
