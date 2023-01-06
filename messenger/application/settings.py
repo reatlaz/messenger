@@ -39,7 +39,7 @@ SECRET_KEY = get_secret('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com']
+ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com', 'localhost']
 
 # CSRF_USE_SESSIONS = True
 CSRF_TRUSTED_ORIGINS = [
@@ -134,6 +134,7 @@ MIDDLEWARE = [
 LOGIN_REQUIRED_IGNORE_PATHS = [
     r'/social-auth/login/google-oauth2/',
     r'/social-auth/complete/google-oauth2/$',
+    r'/admin/',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -193,7 +194,7 @@ WSGI_APPLICATION = 'application.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': get_secret('DATABASES_ENGINE'),
         'NAME': get_secret('DATABASES_NAME'),
         'USER': get_secret('DATABASES_USER'),
         'PASSWORD': get_secret('DATABASES_PASSWORD'),
