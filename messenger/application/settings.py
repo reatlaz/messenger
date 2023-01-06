@@ -39,11 +39,13 @@ SECRET_KEY = get_secret('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com', 'localhost']
+ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 # CSRF_USE_SESSIONS = True
 CSRF_TRUSTED_ORIGINS = [
     'https://reatlaz.pythonanywhere.com',
+    'http://127.0.0.1:8000/',
+    'http://localhost:8000/',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://reatlaz.github.io'
@@ -60,17 +62,17 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
-#
-CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = False
 
 # SESSION_COOKIE_DOMAIN = 'localhost'
 # CSRF_COOKIE_DOMAIN = 'localhost'
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
 
 LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
