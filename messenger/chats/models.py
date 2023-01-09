@@ -63,7 +63,7 @@ class Message(models.Model):
         full_chat = f'{chat.id} {chat.name}'
         return full_chat
 
-    def get_sender(self):
+    def get_sender_name(self):
         sender = self.sender
         # return f'{sender.user.id} {sender.user.username}'
         return f'{sender.user.username}'
