@@ -28,7 +28,7 @@ urlpatterns = [
     path('api/users/', include('users.urls')),
 
     # path('', views.home, name='home'),
-    path('', TemplateView.as_view(template_name="index.html")),
+    path('', TemplateView.as_view(template_name="index.html"), name='home'),
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('social-auth/', include('social_django.urls', namespace='social')),
