@@ -85,7 +85,7 @@ SESSION_COOKIE_SECURE = False
 # LOGOUT_REDIRECT_URL = 'http://localhost:8000#/login/'
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'https://reatlaz.pythonanywhere.com#/login/success/'
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'https://reatlaz.pythonanywhere.com#/login/'
 
