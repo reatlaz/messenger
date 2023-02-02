@@ -65,20 +65,29 @@ CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 CSRF_COOKIE_SAMESITE = 'Strict'
 SESSION_COOKIE_SAMESITE = 'Strict'
 
-
-CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_HTTPONLY = False
+# CSRF_COOKIE_HTTPONLY = False
+# SESSION_COOKIE_HTTPONLY = False
 
 # SESSION_COOKIE_DOMAIN = 'localhost'
 # CSRF_COOKIE_DOMAIN = 'localhost'
 
 # CSRF_COOKIE_SECURE = True
-# SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 
-LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
-LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
-LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
-LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+# LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+# LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
+# LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
+# LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+
+# LOGIN_URL = 'http://localhost:8000#/login/'
+# LOGIN_REDIRECT_URL = 'http://localhost:8000#/login/success/'
+# LOGOUT_URL = 'http://localhost:8000#/'
+# LOGOUT_REDIRECT_URL = 'http://localhost:8000#/login/'
+
+LOGIN_URL = 'https://reatlaz.pythonanywhere.com#/login/'
+LOGIN_REDIRECT_URL = 'https://reatlaz.pythonanywhere.com#/login/success/'
+LOGOUT_URL = 'https://reatlaz.pythonanywhere.com#/'
+LOGOUT_REDIRECT_URL = 'https://reatlaz.pythonanywhere.com#/login/'
 
 # LOGIN_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 # LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
@@ -135,6 +144,7 @@ MIDDLEWARE = [
 ]
 
 LOGIN_REQUIRED_IGNORE_PATHS = [
+    r'',
     r'/social-auth/login/google-oauth2/',
     r'/social-auth/complete/google-oauth2/$',
     r'/admin/',
@@ -164,9 +174,13 @@ ADMINS = ["m3sseng3r@yandex.ru"]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret('GOOGLE_OAUTH2_KEY')  # App ID
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_secret('GOOGLE_OAUTH2_SECRET')  # App Secret
+
+FRONTEND_DIR = BASE_DIR / 'react-chat'
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    os.path.join(FRONTEND_DIR, 'build/static'),
 ]
 
 
@@ -175,7 +189,10 @@ ROOT_URLCONF = 'application.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(FRONTEND_DIR, 'build')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

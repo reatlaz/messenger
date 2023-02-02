@@ -1,0 +1,53 @@
+.icon {
+  font-size: 30px;
+  margin: auto;
+  width: 40px;
+  height: 40px;
+}
+
+.nav-button {
+  line-height: 0px;
+  margin: 10px;
+  padding: 5px;
+  color: white;
+  background-color: transparent;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  cursor: pointer;
+  transition: background-color 0.25s;
+  border-radius: 50%;
+}
+
+.nav-button:hover {
+  background-color: #590073;
+
+}
+
+.attach-button {
+  align-self: center;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  color: grey;
+  background-color: transparent;
+  border: 0;
+  margin: 10px 5px;
+  padding: 5px;
+  text-decoration: none;
+  transition: background-color 0.25s;
+  border-radius: 50%;
+}
+
+.attach-file-button {
+  transform: rotate(90deg);
+  cursor: pointer;
+}
+
+.attach-button:hover {
+  background-color: #d1d1d1;
+}
+
+.attach-button:active {
+  opacity: 0.66;
+}
