@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css';
 
-import { ConnectedPageChat, ConnectedPageGeneralChat, ConnectedPageChatList, PageProfile, PageLogin, PageLoginSuccess } from './pages';
+import { ConnectedPageChat, ConnectedPageChatList, PageProfile, PageLogin, PageLoginSuccess } from './pages';
 
 function App () {
   const PrivateRoute = ({ children }) => {
@@ -25,7 +25,6 @@ function App () {
           <Route path='/im' element={<PrivateRoute><ConnectedPageChatList/></PrivateRoute>}/>
           <Route path='' element={<PrivateRoute><ConnectedPageChatList/></PrivateRoute>}/>
           <Route path='/im/:id' element={<PrivateRoute><ConnectedPageChat /></PrivateRoute>}/>
-          <Route path='/im/general' element={<PrivateRoute><ConnectedPageGeneralChat /></PrivateRoute>}/>
           <Route path='/user/:id' element={<PrivateRoute><PageProfile /></PrivateRoute>}/>
         </Routes>
       </div>
