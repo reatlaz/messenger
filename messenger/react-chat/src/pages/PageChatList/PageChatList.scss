@@ -198,25 +198,26 @@ body>div>a {
 }
 
 .page-chat-list {
-  width: 100%;
+    width: 100%;
 }
  
 img {
-  font-size: 15px;
+    font-size: 15px;
 }
 
 
 .sidebar {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #8d01b8;
-  overflow-x: hidden;
-  padding-top: 70px;
-  transition: 0.25s;
+    white-space: nowrap;
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #8d01b8;
+    overflow-x: hidden;
+    padding-top: 70px;
+    transition: 0.25s;
 }
 
 .sidebar div {

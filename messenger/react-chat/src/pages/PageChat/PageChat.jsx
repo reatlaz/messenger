@@ -111,7 +111,7 @@ function MessageInputForm (props) {
   }
   const postMessage = (data, id) => {
     const csrftoken = getCookie('csrftoken');
-    fetch('https://reatlaz.pythonanywhere.com/api/chats/' + id + '/messages/', {
+    fetch('/api/chats/' + id + '/messages/', {
       method: 'POST',
       mode: 'cors',
       headers: {
