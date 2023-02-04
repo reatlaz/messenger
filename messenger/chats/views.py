@@ -85,13 +85,13 @@ class MessageViewSet(viewsets.ViewSet):
 
     def list(self, request, chat_id):
         try:
-            ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            member = ChatMember.objects.get(user=request.user, chat_id=chat_id)
             # ChatMember.objects.get(user_id=3, chat_id=chat_id)
         except ChatMember.DoesNotExist:
             raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
         messages = Message.objects.filter(chat=chat_id)
         data = MessageSerializer(messages, many=True).data
-        return Response({'data': data, 'user_id': request.user.id})
+        return Response({'data': data, 'user_id': member.id})
 
     def retrieve(self, request, message_id):
         try:
