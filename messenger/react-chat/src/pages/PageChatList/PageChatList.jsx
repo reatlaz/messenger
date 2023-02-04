@@ -4,18 +4,15 @@ import { connect } from 'react-redux'
 
 import './PageChatList.scss';
 import { Button } from '../../components';
-import vkfs from '../../images/vkfs.jpg';
 import barsiq from '../../images/barsiq.png';
 import notificationIcon from '../../images/notificationIcon.png';
-import { getChats, getLastMessageGeneral } from '../../actions';
+import { getChats } from '../../actions';
 
 export function PageChatList (props) {
   const [sideBarIsOpen, setSideBarIsOpen] = useState(false);
   const chats = props.chats;
-  const lastMessageGeneral = props.lastMessageGeneral;
   const { id } = useParams();
   const prevChats = useRef();
-  const prevLastMessageGeneral = useRef();
 
   const emojiNames = [
     'angry-face',
@@ -46,7 +43,6 @@ export function PageChatList (props) {
 
   useEffect(() => {
     prevChats.current = chats;
-    prevLastMessageGeneral.current = lastMessageGeneral;
     window.scrollTo(0, 0);
     pollChats();
     const t = setInterval(() => pollChats(), 10000);
@@ -71,16 +67,6 @@ export function PageChatList (props) {
     prevChats.current = chats;
   }, [chats, id])
 
-  useEffect(() => {
-    const cur = lastMessageGeneral
-    const prev = prevLastMessageGeneral.current
-
-    if (prev && prev._id !== cur._id && id !== undefined) {
-      notifyUser('Новое сообщение: Общий чат', { body: cur.author + ': ' + cur.text, icon: notificationIcon });
-    }
-    prevLastMessageGeneral.current = lastMessageGeneral;
-  }, [lastMessageGeneral, id])
-
   function notifyUser (sender, content) {
     if (!('Notification' in window)) {
       alert('Browser does not support notifications');
@@ -97,7 +83,6 @@ export function PageChatList (props) {
 
   const pollChats = () => {
     props.getChats(id);
-    props.getLastMessageGeneral();
   }
 
   let chatsJSX = null
@@ -164,36 +149,6 @@ export function PageChatList (props) {
           <Button value='search' className="nav-button"/>
       </nav>
       <div className="chats">
-      <Link className="chat" to="/im/general">
-            <img src={vkfs} className="chat-picture" alt="Not found"/>
-            <div className="chat-info">
-                <div className="chat-text-info" >
-                    <div className="chat-name">
-                        Общий чат
-                    </div>
-
-                    {lastMessageGeneral
-                      ? <div className="last-message">
-                        <span>
-                          {lastMessageGeneral.author + ': '}
-                        </span>
-                        {lastMessageGeneral.text && parseMessage(lastMessageGeneral.text)}
-                      </div>
-                      : <div className="last-message">
-                        Нет сообщений
-                      </div>}
-
-                </div>
-                <div className="delivered">
-                    <div className="last-message-time">
-                        {lastMessageGeneral && getTimeFromISOString(lastMessageGeneral.timestamp)}
-                    </div>
-                    <div className='material-icons read-icons'>
-                        done_all
-                    </div>
-                </div>
-            </div>
-        </Link>
         {chatsJSX}
         <Button value='edit' className='create-chat'/>
       </div>
@@ -202,11 +157,10 @@ export function PageChatList (props) {
 }
 
 const mapStateToProps = (state) => ({
-  chats: state.chats.chats,
-  lastMessageGeneral: state.lastMessageGeneral.lastMessageGeneral
+  chats: state.chats.chats
 })
 
-export const ConnectedPageChatList = connect(mapStateToProps, { getChats, getLastMessageGeneral })(PageChatList)
+export const ConnectedPageChatList = connect(mapStateToProps, { getChats })(PageChatList)
 
 export function getTimeFromISOString (timestamp) {
   return new Date(timestamp).toLocaleTimeString('ru',

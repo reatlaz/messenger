@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import { Icon } from '@mui/material';
+// import { Icon } from '@mui/material';
 import './PageChat.scss';
 import { Message, Button, EmojiKeyboard } from '../../components';
 import barsiq from '../../images/barsiq.png';
 import { getTimeFromISOString, PageChatList } from '../'
-import { getChats, getMessages, getLastMessageGeneral } from '../../actions';
+import { getChats, getMessages } from '../../actions';
 
 function Messages (props) {
   const messages = props.messages;
   const memberId = props.member_id
 
-  useEffect(() => {
-    window.scrollTo(0, document.body.scrollHeight);
-  }, [messages.length]);
+  const messagesEndRef = useRef(null)
+
   let messagesJSX = null
   if (messages !== null) {
     messagesJSX = messages.map((msg, index) =>
@@ -30,10 +29,36 @@ function Messages (props) {
         isMine={msg.sender === memberId}
       />)
   }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries, observer) => {
+      const entry = entries[0];
+      console.log('entry', entry);
+      console.log('entry.isIntersecting', entry.isIntersecting);
+      if (messages && messages.at(-1) && messages.at(-1).sender !== memberId) {
+        const lastMessage = messages.at(-1)
+        const csrftoken = getCookie('csrftoken');
+        fetch('/api/chats/messages/' + lastMessage.id + '/mark_as_read/', {
+          method: 'PUT',
+          mode: 'cors',
+          headers: {
+            'Access-Control-Allow-Credentials': true,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrftoken
+            // 'Accept': 'application/json'
+          },
+          credentials: 'include'
+        })
+      }
+    });
+    observer.observe(messagesEndRef.current);
+  }, []);
+
   return (
     <div id="messages">
-      {messagesJSX.reverse()}
-    {/* <div ref={messagesEndRef} /> */}
+      {messagesJSX}
+    <div ref={messagesEndRef} />
     </div>
   )
 }
@@ -92,23 +117,9 @@ function MessageInputForm (props) {
 
   const onEmojiClick = (emojiName) => {
     setText(text + ':' + emojiName + ':')
+    setEmojiKeyboardVisible(false)
   }
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    console.log(name, cookieValue)
-    return cookieValue;
-  }
+
   const postMessage = (data, id) => {
     const csrftoken = getCookie('csrftoken');
     fetch('/api/chats/' + id + '/messages/', {
@@ -246,20 +257,20 @@ function MessageInputForm (props) {
     console.log('location sent');
   }
 
-  const startRecording = () => {
-    setIsRecording(true);
-  }
+  // const startRecording = () => {
+  //   setIsRecording(true);
+  // }
 
   const quickSendVM = () => {
     setVmIsQuick(true);
     setIsRecording(false);
   }
 
-  const stopRecording = () => {
-    setIsRecording(false);
-    setAudioURL('');
-    setImageURL('');
-  }
+  // const stopRecording = () => {
+  //   setIsRecording(false);
+  //   setAudioURL('');
+  //   setImageURL('');
+  // }
   return (
     <form className="form" onSubmit={handleSubmit}>
       {
@@ -300,20 +311,23 @@ function MessageInputForm (props) {
           className='attach-button'
           onClick={sendLocation}
         />
-        <label
+
+        {/* <label
           htmlFor="file-input"
           className='attach-file-button attach-button'
           >
           <Icon className='icon' fontSize='30px'>
             attach_file
           </Icon>
-        </label>
+        </label> */}
         <input type="file" onChange={onImageChange} accept='image/*' id='file-input' hidden/>
-        <Button
+
+        {/* <Button
           value={isRecording ? 'stop' : 'mic'}
           className='attach-button'
           onClick={isRecording ? stopRecording : startRecording}
-        />
+        /> */}
+
       </div>
     </form>
   )
@@ -410,11 +424,27 @@ function PageChat (props) {
 const mapStateToProps = (state) => ({
   messages: state.messages.messages,
   member_id: state.messages.member_id,
-  chats: state.chats.chats,
-  lastMessageGeneral: state.lastMessageGeneral.lastMessageGeneral
+  chats: state.chats.chats
 })
 
-export const ConnectedPageChat = connect(mapStateToProps, { getMessages, getChats, getLastMessageGeneral })(PageChat)
+export const ConnectedPageChat = connect(mapStateToProps, { getMessages, getChats })(PageChat)
+
+const getCookie = (name) => {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  console.log(name, cookieValue)
+  return cookieValue;
+}
 
 function timeSince (isoString) {
   const date = new Date(isoString);

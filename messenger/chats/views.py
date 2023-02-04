@@ -27,7 +27,10 @@ class ChatViewSet(viewsets.ViewSet):
             if chat.is_private:
                 member = get_object_or_404(ChatMember, Q(chat=chat) & ~Q(user_id=request.user.id))
                 chat.name = member.user.first_name + ' ' + member.user.last_name
-        return Response({'data': ChatListSerializer(chats, many=True).data})
+        return Response({
+            'data': ChatListSerializer(chats, many=True).data,
+            'user_id': request.user.id
+        })
 
     def create(self, request):
         serializer = ChatSerializer(data=request.data, context={'auth_user': request.user})
@@ -91,7 +94,10 @@ class MessageViewSet(viewsets.ViewSet):
             raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
         messages = Message.objects.filter(chat=chat_id)
         data = MessageSerializer(messages, many=True).data
-        return Response({'data': data, 'member_id': member.id})
+        return Response({
+            'data': data,
+            'member_id': member.id
+        })
 
     def retrieve(self, request, message_id):
         try:
