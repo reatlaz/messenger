@@ -86,9 +86,9 @@ SESSION_COOKIE_SECURE = False
 # LOGOUT_REDIRECT_URL = 'http://localhost:8000#/login/'
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'https://reatlaz.pythonanywhere.com#/login/success/'
+LOGIN_REDIRECT_URL = '/#/login/success/'
 LOGOUT_URL = 'logout'
-LOGOUT_REDIRECT_URL = 'https://reatlaz.pythonanywhere.com#/login/'
+LOGOUT_REDIRECT_URL = '/#/login/'
 
 # LOGIN_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 # LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
