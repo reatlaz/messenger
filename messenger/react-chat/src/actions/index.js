@@ -27,7 +27,7 @@ export const getMessages = (id) => {
     if (localStorageMessages != null) {
       dispatch(getMessagesSuccess(localStorageMessages));
     } else {
-      dispatch(getMessagesSuccess({ data: [], user_id: null }));
+      dispatch(getMessagesSuccess({ data: [], member_id: null }));
     }
 
     fetch('/api/chats/' + id + '/messages/', {

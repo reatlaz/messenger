@@ -11,7 +11,7 @@ import { getChats, getMessages, getLastMessageGeneral } from '../../actions';
 
 function Messages (props) {
   const messages = props.messages;
-  const user = props.user_id
+  const memberId = props.member_id
 
   useEffect(() => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -26,8 +26,8 @@ function Messages (props) {
         image={msg.image}
         audio={msg.audio}
         time={getTimeFromISOString(msg.created_at)}
-        sender={msg.sender === user ? ' ' : msg.sender_name}
-        isMine={msg.sender === user}
+        sender={msg.sender === memberId ? ' ' : msg.sender_name}
+        isMine={msg.sender === memberId}
       />)
   }
   return (
@@ -394,7 +394,7 @@ function PageChat (props) {
         </nav>
         <Messages
           messages={props.messages}
-          user_id={props.user_id}
+          member_id={props.member_id}
           emojiNames={emojiNames}
         />
         <MessageInputForm
@@ -409,7 +409,7 @@ function PageChat (props) {
 
 const mapStateToProps = (state) => ({
   messages: state.messages.messages,
-  user_id: state.messages.user_id,
+  member_id: state.messages.member_id,
   chats: state.chats.chats,
   lastMessageGeneral: state.lastMessageGeneral.lastMessageGeneral
 })
