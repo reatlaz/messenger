@@ -115,7 +115,6 @@ function MessageInputForm (props) {
       method: 'POST',
       mode: 'cors',
       headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3000/',
         'Access-Control-Allow-Credentials': true,
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
@@ -242,7 +241,7 @@ function MessageInputForm (props) {
       const newMessage = {
         content: `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`
       }
-      props.postMessage(newMessage, props.id);
+      postMessage(newMessage, props.id);
     });
     console.log('location sent');
   }
