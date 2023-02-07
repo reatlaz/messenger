@@ -98,7 +98,8 @@ export function PageChatList (props) {
                   {chat.last_message
                     ? <div className="last-message">
                       <span>
-                        {(chat.is_private ? '' : chat.last_message.sender_name + ': ') + parseMessage(chat.last_message.content)}
+                        {chat.is_private ? '' : <span>{chat.last_message.sender_name + ':'}&nbsp;</span>}
+                        {parseMessage(chat.last_message.content)}
                       </span>
                     </div>
                     : <div className="last-message">
