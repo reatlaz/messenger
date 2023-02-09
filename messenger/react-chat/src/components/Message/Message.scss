@@ -84,14 +84,18 @@
 
 .message-text {
   width: fit-content;
-  display: flex;
+  display: inline;
   overflow-wrap: anywhere;
-  line-height: 1;
+
   align-self: flex-start;
   font-size: 25px;
   border: 0;
   margin: 4px 8px 3px;
   height: max-content;
+}
+
+.message-text > span {
+  line-height: 1;
 }
 
 .message-time {
