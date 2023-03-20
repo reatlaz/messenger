@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import './PageChatList.scss';
 import { Button } from '../../components';
 import barsiq from '../../images/barsiq.png';
-import notificationIcon from '../../images/notificationIcon.png';
+// import notificationIcon from '../../images/notificationIcon.png';
 import { getChats } from '../../actions';
 
 export function PageChatList (props) {
@@ -49,37 +49,35 @@ export function PageChatList (props) {
     return () => clearInterval(t);
   }, []); // // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    const cur = chats
-    const prev = prevChats.current
-    for (let i = 0, j = 0; i < prev.length; i++, j++) {
-      if (prev[j].last_message === null || cur[i].last_message == null) {
-        continue
-      }
-      console.log(prev[j], cur[i])
-      console.log(prev[j].last_message.id, cur[i].last_message.id, Number(id))
-      console.log(prev[j].last_message.id === cur[i].last_message.id)
-      if (prev[j].last_message.id < cur[i].last_message.id && Number(id) !== cur[i].id) {
-        notifyUser('Новое сообщение: ' + cur[i].name, { body: cur[i].last_message.sender + ': ' + cur[i].last_message.content, icon: notificationIcon });
-        i++;
-      }
-    }
-    prevChats.current = chats;
-  }, [chats, id])
+  // !!!!!!!! notifications support code needs to be rewritten (error on 'if (prev[j].last_message === null || cur[i].last_message == null) {')
+  // useEffect(() => {
+  //   const cur = chats
+  //   const prev = prevChats.current
+  //   for (let i = 0, j = 0; i < prev.length; i++, j++) {
+  //     if (prev[j].last_message === null || cur[i].last_message == null) {
+  //       continue
+  //     }
+  //     if (prev[j].last_message.id < cur[i].last_message.id && Number(id) !== cur[i].id) {
+  //       notifyUser('Новое сообщение: ' + cur[i].name, { body: cur[i].last_message.sender + ': ' + cur[i].last_message.content, icon: notificationIcon });
+  //       i++;
+  //     }
+  //   }
+  //   prevChats.current = chats;
+  // }, [chats, id])
 
-  function notifyUser (sender, content) {
-    if (!('Notification' in window)) {
-      alert('Browser does not support notifications');
-    } else if (Notification.permission === 'granted') {
-      new Notification(sender, content);
-    } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          new Notification(sender, content);
-        }
-      })
-    }
-  }
+  // function notifyUser (sender, content) {
+  //   if (!('Notification' in window)) {
+  //     alert('Browser does not support notifications');
+  //   } else if (Notification.permission === 'granted') {
+  //     new Notification(sender, content);
+  //   } else if (Notification.permission !== 'denied') {
+  //     Notification.requestPermission().then((permission) => {
+  //       if (permission === 'granted') {
+  //         new Notification(sender, content);
+  //       }
+  //     })
+  //   }
+  // }
 
   const pollChats = () => {
     props.getChats(id);
@@ -98,7 +96,7 @@ export function PageChatList (props) {
                   {chat.last_message
                     ? <div className="last-message">
                       <span>
-                        {chat.is_private ? '' : <span>{chat.last_message.sender_name + ':'}&nbsp;</span>}
+                        {chat.is_private ? '' : <span>{chat.last_message.sender_name}:&nbsp;</span>}
                         {parseMessage(chat.last_message.content)}
                       </span>
                     </div>
