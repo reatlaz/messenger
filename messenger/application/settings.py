@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import json
+import json, os
 from django.core.exceptions import ImproperlyConfigured
 
 # JSON-based secrets module
@@ -39,10 +39,83 @@ SECRET_KEY = get_secret('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['reatlaz.pythonanywhere.com', 'localhost', '127.0.0.1']
 
+# CSRF_USE_SESSIONS = True
+CSRF_TRUSTED_ORIGINS = [
+    'https://reatlaz.pythonanywhere.com',
+    'http://127.0.0.1:8000/',
+    'http://localhost:8000/',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://reatlaz.github.io'
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://reatlaz.pythonanywhere.com',
+    'https://reatlaz.github.io',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:8000'
+]
 
-# Application definition
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+
+CSRF_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = None
+
+# CSRF_COOKIE_HTTPONLY = False
+# SESSION_COOKIE_HTTPONLY = False
+
+# SESSION_COOKIE_DOMAIN = 'localhost'
+# CSRF_COOKIE_DOMAIN = 'localhost'
+
+# CSRF_COOKIE_SECURE = True
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
+SESSION_COOKIE_SECURE = False
+
+# LOGIN_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+# LOGIN_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
+# LOGOUT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
+# LOGOUT_REDIRECT_URL = 'http://localhost:3000/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+
+# LOGIN_URL = 'http://localhost:8000#/login/'
+# LOGIN_REDIRECT_URL = 'http://localhost:8000#/login/success/'
+# LOGOUT_URL = 'http://localhost:8000#/'
+# LOGOUT_REDIRECT_URL = 'http://localhost:8000#/login/'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/#/login/success/'
+LOGOUT_URL = 'logout'
+LOGOUT_REDIRECT_URL = '/#/login/'
+
+# LOGIN_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+# LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
+# LOGOUT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/'
+# LOGOUT_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.SessionAuthentication'
+#     ]
+# }
+
+CORS_ALLOW_HEADERS = [
+    'Access-Control-Allow-Origin',
+    'Content-Type',
+    'Access-Control-Allow-Credentials',
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'cookie',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,6 +124,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
+    'corsheaders',
+    'social_django',
     'rest_framework',
     'users',
     'chats',
@@ -59,20 +135,66 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 ]
+
+LOGIN_REQUIRED_IGNORE_PATHS = [
+    r'',
+    r'/social-auth/login/google-oauth2/',
+    r'/social-auth/complete/google-oauth2/$',
+    r'/admin/',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.google.GoogleOAuth2',
+    # 'social_core.backends.linkedin.LinkedinOAuth2',
+    # 'social_core.backends.instagram.InstagramOAuth2',
+    # 'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# CELERY_IMPORTS = ("application.tasks", )
+
+# sending emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
+# administrator list
+ADMINS = ["m3sseng3r@yandex.ru"]
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret('GOOGLE_OAUTH2_KEY')  # App ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_secret('GOOGLE_OAUTH2_SECRET')  # App Secret
+
+FRONTEND_DIR = BASE_DIR / 'react-chat'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(FRONTEND_DIR, 'build'),
+    os.path.join(FRONTEND_DIR, 'build/static'),
+]
+
 
 ROOT_URLCONF = 'application.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(FRONTEND_DIR, 'build')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,6 +202,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
             ],
         },
     },
@@ -93,12 +216,11 @@ WSGI_APPLICATION = 'application.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': get_secret('DATABASES_ENGINE'),
         'NAME': get_secret('DATABASES_NAME'),
         'USER': get_secret('DATABASES_USER'),
         'PASSWORD': get_secret('DATABASES_PASSWORD'),
         'HOST': get_secret('DATABASES_HOST'),
-        'PORT': get_secret('PORT'),
     }
 }
 
@@ -121,7 +243,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = "users.User" 
+AUTH_USER_MODEL = "users.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -137,7 +259,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -148,7 +269,8 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-""" try:
+try:
     from .local_settings import *
+    print('############### local_settings imported ##################')
 except ImportError:
-    pass """
+    pass

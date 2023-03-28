@@ -17,11 +17,19 @@ from django.contrib import admin
 from django.conf.urls import include
 from django.urls import path
 from chats.views import index
+from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
+from chats import views as views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', index, name='index'),
-    path('chats/', include('chats.urls')),
-    path('users/', include('users.urls')),
-    path('', include('users.urls')),
+    path('api/chats/', include('chats.urls')),
+    path('api/users/', include('users.urls')),
+
+    # path('', views.home, name='home'),
+    path('', TemplateView.as_view(template_name="index.html"), name='home'),
+    path('login/', views.login, name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('social-auth/', include('social_django.urls', namespace='social')),
 ]

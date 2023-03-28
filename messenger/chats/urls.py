@@ -1,7 +1,7 @@
 from django.urls import path
 from chats.views import ChatViewSet, MessageViewSet, MemberViewSet
 urlpatterns = [
-    path('user/<int:user_id>/', ChatViewSet.as_view({
+    path('', ChatViewSet.as_view({
         'get': 'list'
     }), name='chat_list'),
 

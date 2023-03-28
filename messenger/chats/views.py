@@ -1,68 +1,84 @@
-import json
+import redis
 # from django.http import JsonResponse
+from login_required import login_not_required
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.db.models import Q
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotAuthenticated
 from rest_framework.response import Response
-# from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from .models import Chat, Message, ChatMember
 from users.models import User
-from .serializers import ChatSerializer, MessageSerializer, MemberSerializer
+from .serializers import ChatSerializer, ChatListSerializer, ChatUpdateSerializer
+from .serializers import MessageSerializer, MessageUpdateSerializer, MessageMarkAsReadSerializer
+from .serializers import MemberSerializer
+from .tasks import send_email
 
 
 class ChatViewSet(viewsets.ViewSet):
-    # валидация в сериалайзере ValidationError
-    # сделать максимально короткие view
-    def list(self, request, user_id):
-        chat_members = ChatMember.objects.filter(user=user_id)
-        data = []
-        for member in chat_members:
-            chat = ChatSerializer(member.chat).data
-            try:
-                last_message_object = Message.objects.filter(chat=member.chat).latest('created_at')
-                last_message = MessageSerializer(last_message_object).data
-            except Message.DoesNotExist:
-                last_message = None
-            chat['last_message'] = last_message
-            data.append(chat)
-        return Response({'data': data})
+    # вопрос: стоит ли делать новый сериализатор для это вью?
+    # вопрос: не мешают ли айди всего и вся из сериализаторов, которые используются в других вью?
+    def list(self, request):
+        chats = Chat.objects.filter(members__user=request.user.id)
+        # chats = Chat.objects.filter(members__user=3)
+        for chat in chats:
+            if chat.is_private:
+                member = get_object_or_404(ChatMember, Q(chat=chat) & ~Q(user_id=request.user.id))
+                chat.name = member.user.first_name + ' ' + member.user.last_name
+        return Response({
+            'data': ChatListSerializer(chats, many=True).data,
+            'user_id': request.user.id
+        })
 
     def create(self, request):
-        #  validate serializer для получения данных
-        chat_name = request.POST.get('chat_name', 'New chat')
-        chat_description = request.POST.get('description', '')
-        user_ids = [int(str_user_id) for str_user_id in request.POST.getlist('user_ids')]
-        chat = Chat.objects.create(name=chat_name, description=chat_description)
-        # chat.save()
-        for user_id in user_ids:
-            user = get_object_or_404(User, id=user_id)
-            member = ChatMember.objects.create(user=user, chat=chat)
-            member.save()
-        # data = ChatSerializer(chat).data
-        return Response({'data': chat.id}, status=201)
+        serializer = ChatSerializer(data=request.data, context={'auth_user': request.user})
+        serializer.is_valid(raise_exception=True)
+        chat = serializer.save()
+        return Response({'data': ChatSerializer(chat).data}, status=201)
 
     def retrieve(self, request, chat_id):
+        try:
+            request.user.id
+        except TypeError:
+            raise NotAuthenticated({"message": "You must be authorized to view this page"})
+        try:
+            ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            # ChatMember.objects.get(user_id=3, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat"})
         chat = get_object_or_404(Chat, id=chat_id)
-        data = ChatSerializer(chat).data
-        return Response({'data': data})
+        if chat.is_private:
+            member = get_object_or_404(ChatMember, Q(chat_id=chat_id) & ~Q(user_id=request.user.id))
+            chat.name = member.user.first_name + ' ' + member.user.last_name
+            last_login = member.user.last_login
+        else:
+            last_login = None
+        return Response({'data': {
+            'chat': ChatSerializer(chat).data,
+            'last_login': last_login
+        }})
 
     def update(self, request, chat_id):
+        try:
+            auth_usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        if not (auth_usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to alter this chat"})
+        serializer = ChatUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # а можно как-то короче через save?
         chat = get_object_or_404(Chat, id=chat_id)
-        json_data = json.loads(request.body)
-        chat.name = json_data.get('name', chat.name)
-        chat.description = json_data.get('description', chat.description)
-        chat.save()
-        return Response({
-            'data':
-                {
-                    'id': chat.id,
-                    'name': chat.name,
-                    'description': chat.description,
-                },
-            })
+        chat = serializer.update(chat, serializer.validated_data)
+        return Response({'data': ChatUpdateSerializer(chat).data})
 
     def destroy(self, request, chat_id):
+        try:
+            ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat"})
         chat = get_object_or_404(Chat, id=chat_id)
         chat.delete()
         return Response({})
@@ -71,49 +87,61 @@ class ChatViewSet(viewsets.ViewSet):
 class MessageViewSet(viewsets.ViewSet):
 
     def list(self, request, chat_id):
+        try:
+            member = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            # ChatMember.objects.get(user_id=3, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
         messages = Message.objects.filter(chat=chat_id)
-        response_data = MessageSerializer(messages, many=True).data
-        return Response({'messages': response_data})
+        data = MessageSerializer(messages, many=True).data
+        return Response({
+            'data': data,
+            'member_id': member.id
+        })
 
     def retrieve(self, request, message_id):
-        message = get_object_or_404(Message, id=message_id)
-        data = MessageSerializer(message).data
-        return Response({'data': data})
+        try:
+            message = get_object_or_404(Message, id=message_id)
+            ChatMember.objects.get(user=request.user, chat_id=message.chat.id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        return Response({'data': MessageSerializer(message).data})
 
     def create(self, request, chat_id):
-        message_content = request.POST.get('content')
-        user_id = request.POST.get('user_id')
-        sender = get_object_or_404(ChatMember, chat=chat_id, user=user_id)
-        message = Message.objects.create(content=message_content, sender=sender, chat=sender.chat)
-        message.save()
-        return Response({'new_message_id': message.id}, status=201)
+        try:
+            auth_usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+            # auth_usr = ChatMember.objects.get(user_id=3, chat_id=chat_id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        serializer = MessageSerializer(data=request.data, context={'chat_id': chat_id, 'auth_usr': auth_usr})
+        serializer.is_valid(raise_exception=True)
+        message = serializer.save()
+        return Response({'data': MessageSerializer(message).data}, status=201)
 
     def update(self, request, message_id):
+        try:
+            message = get_object_or_404(Message, id=message_id)
+            auth_usr = ChatMember.objects.get(user=request.user, chat_id=message.chat.id)
+        except ChatMember.DoesNotExist:
+            raise PermissionDenied({"message": "You don't have access to this chat or it doesn't exist"})
+        if not (auth_usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to alter this chat"})
+        serializer = MessageUpdateSerializer(
+            data=request.data, context={'message_id': message_id})
+        serializer.is_valid(raise_exception=True)
+        # а можно как-то короче через save?
         message = get_object_or_404(Message, id=message_id)
-        json_data = json.loads(request.body)
-        message.content = json_data.get('content', message.content)
-        message.save()
-        return Response({
-            'edited_message':
-                {
-                    'content': message.content,
-                    'chat': message.chat.id,
-                    'sender': message.sender.user.id,
-                    'created_at': message.created_at,
-                    'is_forwarded': message.is_forwarded,
-                },
-        })
+        message = serializer.update(message, serializer.validated_data)
+        return Response({'data': MessageSerializer(message).data})
 
     def partial_update(self, request, message_id):
+        serializer = MessageMarkAsReadSerializer(
+            data=request.data, context={'message_id': message_id})
+        serializer.is_valid(raise_exception=True)
+        # а можно как-то короче через save?
         message = get_object_or_404(Message, id=message_id)
-        message.is_read = True
-        message.save()
-        return Response({
-            'message_marked_as_read':
-                {
-                    'id': message.id
-                }
-        })
+        message = serializer.update(message, serializer.validated_data)
+        return Response({'data': MessageSerializer(message).data})
 
     def destroy(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
@@ -121,24 +149,26 @@ class MessageViewSet(viewsets.ViewSet):
         return Response({})
 
 
-# class AddRemoveMember(RetrieveUpdateDestroyAPIView):
-#    serializer_class = MemberSerializer
-
-
 class MemberViewSet(viewsets.ViewSet):
 
-    def create(self, request, chat_id, user_id):   # 3 to be tested
+    def create(self, request, chat_id, user_id):
+        usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        if not(usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to add users"})
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
-        member = ChatMember.objects.get_or_create(user=user, chat=chat)
+        if ChatMember.objects.filter(user=user, chat=chat).exists():
+            raise ValidationError("User already in the chat")
+        else:
+            member = ChatMember.objects.create(user=user, chat=chat)
+            send_email(user.username, chat_id)
+            data = MemberSerializer(member).data
+            return Response({'data': data})
 
-        return Response({
-            'data': {
-                'id': member.id,
-            }
-        }, status=201)
-
-    def destroy(self, request, chat_id, user_id):  # 4 to be tested
+    def destroy(self, request, chat_id, user_id):
+        usr = ChatMember.objects.get(user=request.user, chat_id=chat_id)
+        if not (usr.role == 'admin'):
+            raise PermissionDenied({"message": "You don't have permission to delete users"})
         chat = get_object_or_404(Chat, id=chat_id)
         user = get_object_or_404(User, id=user_id)
         member = get_object_or_404(ChatMember, user=user, chat=chat)
@@ -152,6 +182,25 @@ class MemberViewSet(viewsets.ViewSet):
 @require_GET
 def index(request):
     return render(request, 'chats/index.html')
+
+
+@require_GET
+def home(request):
+    return render(request, 'home.html')
+
+
+@require_GET
+@login_not_required
+def login(request):
+#    r = redis.Redis()
+#    if r.exists('users_last_month'):
+#        users_last_month = int(r.get('users_last_month'))
+#    else:
+#        users_last_month = 0
+    users_last_month = 0
+    return render(request, 'login.html', {'users_last_month': users_last_month})
+
+
 
 
 

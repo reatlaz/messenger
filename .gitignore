@@ -9,7 +9,7 @@ ldap.log
 local_settings.py
 node_modules/
 static/foto/
-build/
+# build/
 yarn-error.log
 .idea
 .ropeproject

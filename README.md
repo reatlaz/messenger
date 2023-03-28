@@ -1,3 +1,3 @@
-# VK-FS-Backend
+# Full-stack messenger app
 
-Homework and the final project for the backend section of the VK Fullstack course.
+Started as homework for the full-stack development VK course.
