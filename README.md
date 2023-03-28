@@ -1,3 +1,3 @@
-# Full-stack messenger app
+# Full-stack messaging app
 
-Started as homework for the full-stack development VK course.
+My pet project which started as a VK fullstack development course assignment repository.
