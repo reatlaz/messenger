@@ -1,25 +1,58 @@
-{% extends 'base.html' %}
-{% block title %} Sign in {% endblock %}
-{% block content %}
+{% comment %} {% extends 'base.html' %}
+{% block title %} Sign in {% endblock %} {% endcomment %}
 
-<div class="row">
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="{% static 'page_login.css' %}" />
+    <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  />
+    <title>Messenger login</title>
+</head>
+<body>
+    <div class='page-login'>
+        <div class='login-heading'>
+            Messenger
+        </div>
+        <div class='login-button-container'>
+            <a class='login-button google-auth' href="{% url 'social:begin' 'google-oauth2' %}">
+            <img
+                alt='oauth provider icon'
+                src="{% static 'google.png' %}"
+            />
+            <div class='login-button-text'>
+                Login with Google
+            </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+{% comment %} <div class="row">
     <div class="row">
         <div class="col-md-8 mx-auto social-container my-2 order-md-1">
             <button class="btn btn-danger mb-2">
                 <a href="{% url 'social:begin' 'google-oauth2' %}">Login With Google</a>
             </button>
-            {% comment %} <button class="btn btn-primary mb-2">
+            <button class="btn btn-primary mb-2">
                 <a href="#">Login with Instagram</a>
             </button>
             <button class="btn btn-info mb-2">
                 <a href="#">Login with LinkedIn</a>
-            </button> {% endcomment %}
+            </button>
         </div>
     </div>
-    {% comment %} <div class="row">
+    <div class="row">
         <div class="mx-auto">
             {{users_last_month}} unique users last month.
         </div>
-    </div> {% endcomment %}
-</div>
-{% endblock %}
+    </div>
+</div> {% endcomment %}
