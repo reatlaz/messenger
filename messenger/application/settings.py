@@ -145,7 +145,7 @@ MIDDLEWARE = [
 ]
 
 LOGIN_REQUIRED_IGNORE_PATHS = [
-    r'',
+    r'/#/login',
     r'/social-auth/login/google-oauth2/',
     r'/social-auth/complete/google-oauth2/$',
     r'/admin/',
