@@ -129,7 +129,7 @@ export function PageChatList (props) {
   const logOut = () => {
     localStorage.setItem('sessionExpires', JSON.stringify(null));
     fetch('/logout/')
-    window.location.replace('/')
+    window.location.replace('/login')
   }
   return (
     <div id='main' className='page-chat-list'>

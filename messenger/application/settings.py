@@ -85,10 +85,10 @@ SESSION_COOKIE_SECURE = False
 # LOGOUT_URL = 'http://localhost:8000#/'
 # LOGOUT_REDIRECT_URL = 'http://localhost:8000#/login/'
 
-LOGIN_URL = '/#/login/'
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/#/login/success/'
-LOGOUT_URL = '/#/logout/'
-LOGOUT_REDIRECT_URL = '/#/login/'
+LOGOUT_URL = 'logout'
+LOGOUT_REDIRECT_URL = 'login'
 
 # LOGIN_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/'
 # LOGIN_REDIRECT_URL = 'https://reatlaz.github.io/2022-2-VK-EDU-FS-Frontend-R-AFIATULLOV#/login/success/'
@@ -145,7 +145,6 @@ MIDDLEWARE = [
 ]
 
 LOGIN_REQUIRED_IGNORE_PATHS = [
-    r'/#/login',
     r'/social-auth/login/google-oauth2/',
     r'/social-auth/complete/google-oauth2/$',
     r'/admin/',
